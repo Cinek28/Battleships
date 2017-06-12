@@ -1,4 +1,4 @@
-package NetworkInterface;
+package Model.NetworkInterface;
 
 import java.util.Iterator;
 
@@ -82,7 +82,7 @@ public class ConnectionListener extends Thread {
 									GameEvent geOut;
 									geOut = new GameEvent(
 											GameEvent.S_LOGIN_FAIL,
-											"W grze znajduje siê ju¿ dwóch graczy!");
+											"W grze znajduje siï¿½ juï¿½ dwï¿½ch graczy!");
 									sendMessage(connection, geOut);
 									geOut = new GameEvent(
 											GameEvent.S_TOO_MANY_CONNECTIONS);
@@ -101,8 +101,8 @@ public class ConnectionListener extends Thread {
 									GameEvent geOut;
 									geOut = new GameEvent(
 											GameEvent.S_LOGIN_FAIL,
-											"U¿ytkownik \"" + ge.getPlayerId()
-													+ "\" ju¿ istnieje");
+											"Uï¿½ytkownik \"" + ge.getPlayerId()
+													+ "\" juï¿½ istnieje");
 									sendMessage(connection, geOut);
 									geOut = new GameEvent(
 											GameEvent.S_USER_EXIST);

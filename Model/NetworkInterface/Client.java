@@ -1,4 +1,4 @@
-package NetworkInterface;
+package Model.NetworkInterface;
 
 import java.net.Socket;
 

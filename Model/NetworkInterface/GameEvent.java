@@ -1,4 +1,4 @@
-package NetworkInterface;
+package Model.NetworkInterface;
 
 /** Class for generating network messages */
  
