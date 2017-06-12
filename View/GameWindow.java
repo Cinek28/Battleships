@@ -1,23 +1,29 @@
 package View;
 
-
 import javafx.application.Application;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene; 
-import javafx.scene.paint.Color; 
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.TilePane;
 
@@ -48,18 +54,14 @@ public class GameWindow extends Application{
 		   chatArea.setPrefSize(300, 100);
 		   
 		   TilePane hostConnect = new TilePane(Orientation.HORIZONTAL);
-//		   hostConnect.setPadding(new Insets(2, 1, 2, 0));
 		   hostConnect.setHgap(1.0);
 		   hostConnect.setVgap(1.0);
 		   hostConnect.getChildren().addAll(hostPortLabel, hostPortField, connect);
-//		   HBox hostConnect = new HBox(20,hostPortLabel,hostPortField, connect);
 		   TilePane hostIp = new TilePane(Orientation.HORIZONTAL);
-//		   hostIp.setPadding(new Insets(2, 1, 2, 0));
 		   hostIp.setHgap(1.0);
 		   hostIp.setVgap(1.0);
 		   hostIp.getChildren().addAll(hostIpLabel, hostIpField);
 		   TilePane ip = new TilePane(Orientation.HORIZONTAL);
-//		   ip.setPadding(new Insets(2, 1, 2, 0));
 		   ip.setHgap(1.0);
 		   ip.setVgap(1.0);
 		   ip.getChildren().addAll(serverPortLabel, serverPort, startServer);
@@ -68,29 +70,48 @@ public class GameWindow extends Application{
 		   configs.setVgap(1.0);
 		   configs.getChildren().addAll(hostIp, hostConnect, ip);
 		   configs.setMaxWidth(200);
-//		   HBox ip = new HBox(20,serverPortLabel,serverPort,startServer);
 		   TilePane messageSend = new TilePane(Orientation.HORIZONTAL);
 		   messageSend.setHgap(1.0);
 		   messageSend.setVgap(1.0);
 		   messageSend.getChildren().addAll(chatField, send);
-//		   VBox chat = new VBox(chatArea,messageSend);
 		   TilePane chat = new TilePane(Orientation.VERTICAL);
 		   chat.setHgap(1.0);
 		   chat.setVgap(1.0);
 		   chat.getChildren().addAll(chatArea,messageSend);
-//		   HBox root = new HBox(configs,chat);
-//		   TilePane root = new TilePane(Orientation.HORIZONTAL);
-//		   root.setPrefColumns(2);
-//		   root.setHgap(1.0);
-//		   root.setVgap(1.0);
-//		   root.getChildren().addAll(configs, chat);
-//		   HBox root = new HBox(configs,chat);
+		   GridPane myBoard = new GridPane();
+		   myBoard.getColumnConstraints().add(new ColumnConstraints(7));
+		   myBoard.getRowConstraints().add(new RowConstraints(5));
+		   int width = 20;
+		   int height = 20;
+		   for (int r = 0; r < 15; r++) {
+		        for (int c = 0; c < 15; c++) {
+		        	Rectangle rectangle = new Rectangle(r*width, c*height, width, height);
+		        	rectangle.setFill(Color.GREEN);
+		        	rectangle.setStroke(Color.BLACK);
+		            myBoard.add(rectangle, c, r);
+		        }
+		    }
+		   
+		   GridPane enemyBoard = new GridPane();
+		   enemyBoard.getColumnConstraints().add(new ColumnConstraints(7));
+		   enemyBoard.getRowConstraints().add(new RowConstraints(5));
+		   for (int r = 0; r < 15; r++) {
+		        for (int c = 0; c < 15; c++) {
+		        	Rectangle rectangle = new Rectangle(r*width, c*height, width, height);
+		        	rectangle.setFill(Color.GRAY);
+		        	rectangle.setStroke(Color.BLACK);
+		            enemyBoard.add(rectangle, c, r);
+		        }
+		   }
+		   
 		   GridPane root = new GridPane();
 		   root.getColumnConstraints().add(new ColumnConstraints(500));
-		   root.getRowConstraints().add(new RowConstraints(350));
+		   root.getRowConstraints().add(new RowConstraints(350)); 
 		   GridPane.setConstraints(configs, 0, 1);
 		   GridPane.setConstraints(chat,1,1);
-		   root.getChildren().addAll(configs,chat);
+		   GridPane.setConstraints(myBoard, 0, 0, 10, 10, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS,new Insets(30,0,0,80));
+		   GridPane.setConstraints(enemyBoard, 1, 0, 10, 10, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS,new Insets(30,0,0,80));
+		   root.getChildren().addAll(configs,chat,myBoard,enemyBoard);
 		   root.setGridLinesVisible(true);
 		   root.setPrefSize(1000, 600);
 		   root.setMaxSize(1000, 600);
