@@ -40,7 +40,9 @@ public class GameWindow extends Application{
 	   private Button send = new Button("Send message");
 	   private Button startServer = new Button("Start server");
  	   private Button connect = new Button("Connect to server");
-		
+	   private GridPane enemyBoard = new GridPane();
+	   private GridPane myBoard = new GridPane();
+ 	   /**Initializing window: */
 	   private Parent setParent(){
 		   /** Buttons initialization: */
 		   startServer.setPrefSize(150, 10);
@@ -78,7 +80,7 @@ public class GameWindow extends Application{
 		   chat.setHgap(1.0);
 		   chat.setVgap(1.0);
 		   chat.getChildren().addAll(chatArea,messageSend);
-		   GridPane myBoard = new GridPane();
+
 		   myBoard.getColumnConstraints().add(new ColumnConstraints(7));
 		   myBoard.getRowConstraints().add(new RowConstraints(5));
 		   int width = 20;
@@ -91,8 +93,7 @@ public class GameWindow extends Application{
 		            myBoard.add(rectangle, c, r);
 		        }
 		    }
-		   
-		   GridPane enemyBoard = new GridPane();
+		  
 		   enemyBoard.getColumnConstraints().add(new ColumnConstraints(7));
 		   enemyBoard.getRowConstraints().add(new RowConstraints(5));
 		   for (int r = 0; r < 15; r++) {
@@ -122,14 +123,6 @@ public class GameWindow extends Application{
 	   
 	   @Override     
 	   public void start(Stage primaryStage) throws Exception {            
-		      //creating a Group object 
-//		      Group group = new Group(); 
-		       
-		      //Creating a Scene by passing the group object, height and width   
-//		      Scene scene = new Scene(group ,800, 600); 
-		      
-		      //setting color to the scene 
-//		      scene.setFill(Color.GRAY);  
 		      
 		      //Setting the title to Stage. 
 		      primaryStage.setTitle("Battleships"); 
@@ -139,7 +132,19 @@ public class GameWindow extends Application{
 		       
 		      //Displaying the contents of the stage 
 		      primaryStage.show(); 
-		   }      
+		   }
+	   
+	   public void setBoardColor(Color color, int x, int y, int whichBoard){
+		   Rectangle rect;
+		   if(whichBoard == 0){
+			   rect = (Rectangle)myBoard.getChildren().get(x+y*15);
+		   }
+		   else{
+			   rect = (Rectangle)enemyBoard.getChildren().get(x+y*15);
+		   }
+		   
+	   }
+	   
 	   public static void main(String args[]){           
 	      launch(args);      
 	   } 
