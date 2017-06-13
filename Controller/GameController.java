@@ -45,6 +45,12 @@ public class GameController {
 		
 		
 	}
+	public static void sendMessage(String messageStr){
+		
+	}
+	public static void connectToServer(String hostIp,String hostPort){
+		
+	}
 	
 }
 

@@ -13,10 +13,10 @@ public class Client {
 
 	private Connection connection = null;
 
-	public Client(String nick, String host, int port) {
+	public Client(String ID, String host, int port) {
+		this.playerID = ID;
 		this.host = host;
 		this.port = port;
-		this.playerID = nick;
 	}
 
 	public boolean start() {

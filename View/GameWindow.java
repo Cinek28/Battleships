@@ -38,6 +38,7 @@ public class GameWindow extends Application{
 	   private TextField hostPortField = new TextField();
 	   private TextField chatField = new TextField();
 	   private TextField serverPort = new TextField();
+	   private TextField statusField = new TextField("Welcome!");
 	   private Button send = new Button("Send message");
 	   private Button startServer = new Button("Start server");
  	   private Button connect = new Button("Connect to server");
@@ -51,21 +52,21 @@ public class GameWindow extends Application{
 	   private void setBoards(){
 		   int width = 35;
 		   int height = 35;
-		   for (int r = 0; r < 10; r++) {
-		        for (int c = 0; c < 10; c++) {
-		        	myBoard[r][c] = new Rectangle(20 + r*width,20+ c*height, width, height);
-		        	myBoard[r][c].setFill(Color.GREEN);
-		        	myBoard[r][c].setStroke(Color.BLACK);
-		        	myBoardGroup.getChildren().addAll(myBoard[r][c]);
+		   for (int row = 0; row < 10; ++row) {
+		        for (int col = 0; col < 10; ++col) {
+		        	myBoard[row][col] = new Rectangle(20 + col*width,20+ row*height, width, height);
+		        	myBoard[row][col].setFill(Color.GREEN);
+		        	myBoard[row][col].setStroke(Color.BLACK);
+		        	myBoardGroup.getChildren().addAll(myBoard[row][col]);
 		            }
 		    }
 		  
-		   for (int r = 0; r < 10; r++) {
-		        for (int c = 0; c < 10; c++) {
-		        	enemyBoard[r][c] = new Rectangle(20 + r*width,20 + c*height, width, height);
-		        	enemyBoard[r][c].setFill(Color.GRAY);
-		        	enemyBoard[r][c].setStroke(Color.BLACK);
-		        	enemyBoardGroup.getChildren().addAll(enemyBoard[r][c]);
+		   for (int row = 0; row < 10; ++row) {
+		        for (int col = 0; col < 10; ++col) {
+		        	enemyBoard[row][col] = new Rectangle(20 + col*width,20 +row*height, width, height);
+		        	enemyBoard[row][col].setFill(Color.GRAY);
+		        	enemyBoard[row][col].setStroke(Color.BLACK);
+		        	enemyBoardGroup.getChildren().addAll(enemyBoard[row][col]);
 		        }
 		   }
 		   
@@ -75,16 +76,18 @@ public class GameWindow extends Application{
 		   startServer.setPrefSize(150, 10);
 		   send.setPrefSize(150, 10);
 		   connect.setPrefSize(150, 10);
+		   startServer.setAlignment(Pos.CENTER);
+		   send.setAlignment(Pos.CENTER);
+		   connect.setAlignment(Pos.CENTER);
 		   //Boards:
 		   setBoards();
-		      GameController.repaintBoard(this, 0);
-			  GameController.repaintBoard(this, 1);
+		   GameController.repaintBoard(this, 0);
+		   GameController.repaintBoard(this, 1);
 		   //Overriding button actions:
 		   
 		   startServer.setOnAction(new EventHandler<ActionEvent>() {
 			    @Override 
 			    public void handle(ActionEvent e) {
-//			    	String hostName = serverIpField.getText();
 			    	String serverPortStr = serverPort.getText();
 			    	GameController.startServer(serverPortStr);
 //			    	setBoards();
@@ -96,7 +99,7 @@ public class GameWindow extends Application{
 			    public void handle(ActionEvent e) {
 			    	String hostIpStr = hostIpField.getText();
 			    	String hostPortStr = hostPortField.getText();
-
+			    	GameController.connectToServer(hostIpStr,hostPortStr);
 			    }
 		   });
 		   
@@ -104,6 +107,7 @@ public class GameWindow extends Application{
 			    @Override 
 			    public void handle(ActionEvent e) {
 			    	String messageStr = chatField.getText();
+			    	GameController.sendMessage(messageStr);
 			    	}
 		   });
 		   /**TextField initialization: */
@@ -111,6 +115,11 @@ public class GameWindow extends Application{
 		   hostIpField.setPrefSize(150, 10);
 		   hostPortField.setPrefSize(150, 10);
 		   serverPort.setPrefSize(150, 10);
+		   statusField.setEditable(false);
+		   statusField.setPrefSize(300, 20);
+		   statusField.setMaxSize(300, 20);
+		   statusField.setMinSize(300, 20);
+		   statusField.setAlignment(Pos.CENTER_RIGHT);
 		   chatArea.setPrefSize(300, 100);
 		   chatArea.setMaxSize(300, 100);
 		   chatArea.setMinSize(300, 100);
@@ -134,12 +143,10 @@ public class GameWindow extends Application{
 		   TilePane configs = new TilePane(Orientation.VERTICAL);
 		   configs.setHgap(1.0);
 		   configs.setVgap(1.0);
-		   startServer.setAlignment(Pos.CENTER_RIGHT);
-		   connect.setAlignment(Pos.CENTER_RIGHT);
 		   HBox ss = new HBox(startServer,connect);
 		   ss.setAlignment(Pos.BOTTOM_RIGHT);
-		   configs.setAlignment(Pos.CENTER_RIGHT);
-		   configs.getChildren().addAll(hostIp, hostConnect, ip, ss);
+		   configs.setAlignment(Pos.BOTTOM_RIGHT);
+		   configs.getChildren().addAll(hostIp, hostConnect, ip, ss, statusField);
 		   configs.setMaxWidth(200);
 		   TilePane messageSend = new TilePane(Orientation.HORIZONTAL);
 		   messageSend.setHgap(1.0);
@@ -147,7 +154,7 @@ public class GameWindow extends Application{
 		   messageSend.getChildren().addAll(chatField, send);
 		   HBox chatt = new HBox(chatArea);
 		   TilePane chat = new TilePane(Orientation.VERTICAL);
-		   chat.setAlignment(Pos.CENTER_LEFT);
+		   chat.setAlignment(Pos.CENTER_RIGHT);
 		   chat.setHgap(1.0);
 		   chat.setVgap(1.0);
 		   chat.getChildren().addAll(chatt,messageSend);

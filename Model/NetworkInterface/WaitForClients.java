@@ -16,7 +16,7 @@ public class WaitForClients extends Thread {
 			Socket clientSocket;
 			try {
 				clientSocket = server.serverSocket.accept();
-
+//Adding new connected client:
 				Connection connection = new Connection(clientSocket);
 				server.getConnections().add(connection);
 				connection.start();

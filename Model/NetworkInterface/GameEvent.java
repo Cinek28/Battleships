@@ -98,10 +98,6 @@ public class GameEvent {
 	/** Message */
 	private String message;
 
-	public GameEvent() {
-
-	}
-
 	public GameEvent(int type) {
 		setType(type);
 	}

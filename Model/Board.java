@@ -19,17 +19,17 @@ public class Board {
 				boardState[i][j] = Status.ISNOTSHIP;
 				enemyBoardState[i][j] = Status.UNKNOWN;
 			}
-		noOfShipsActive = 6;
+		noOfShipsActive = 8;
 	}
 	
-	public Status getStatus(int x, int y){
-		return boardState[x][y];
+	public Status getStatus(int row, int col){
+		return boardState[row][col];
 	}
-	public Status getEnemyStatus(int x, int y){
-		return enemyBoardState[x][y];
+	public Status getEnemyStatus(int row, int col){
+		return enemyBoardState[row][col];
 	}
-	public void setStatus(int x, int y, Status newStatus){
-		boardState[x][y] = newStatus;
+	public void setStatus(int row, int col, Status newStatus){
+		boardState[row][col] = newStatus;
 	}
 	public int getNoOfShipsActive(){
 		return noOfShipsActive;
@@ -52,12 +52,14 @@ public class Board {
 		boolean isOk = true;
 		int x, y, length = 0, upperLeftX, upperLeftY, lowerRightX, lowerRightY;
 		Direction direction;
-		for(int i = 0; i < 6;){
+		for(int i = 0; i < 7;){
 			if(i < 1)
-				length = 3;
+				length = 4;
 			else if(i >=1 && i < 3)
+				length = 3;
+			else if(i >= 3 && i < 5)
 				length = 2;
-			else if(i >= 3 && i < 6)
+			else
 				length = 1;
 			direction = (generator.nextInt(2) == 0 ? Direction.HORIZONTAL:Direction.VERTICAL);
 //			Horizontal:
@@ -78,26 +80,23 @@ public class Board {
 				lowerRightX = Math.min(SIZE-1,x+1);
 				lowerRightY = Math.min(SIZE-1,y+length+1);
 			}
-			for(int m = upperLeftX; m <= lowerRightX;++m)
-				for(int k = upperLeftY; k <= lowerRightY;++k){
-					if(boardState[m][k] != Status.ISNOTSHIP){
+			for(int row = upperLeftY; row <= lowerRightY;row++)
+				for(int col = upperLeftX; col <= lowerRightX;col++){
+					if(boardState[row][col] != Status.ISNOTSHIP){
 						isOk = false;
 						break;
 					}
-					else{
-						isOk =true;
-					}
 				}
 			if(isOk == true){
-				for (int m = 0; m < length; ++m)
+				for (int l = 0; l < length; ++l)
 					if (direction == Direction.HORIZONTAL) {
-						boardState[x + m][y] = Status.ISSHIP;
+						boardState[y][x+l] = Status.ISSHIP;
 					} else {
-						boardState[x][y + m] = Status.ISSHIP;
+						boardState[y + l][x] = Status.ISSHIP;
 					}
 			++i;
 			}
-			System.out.println(i);
+			isOk =true;
 		}
 	}
 
