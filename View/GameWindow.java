@@ -33,6 +33,8 @@ public class GameWindow extends Application{
 	   private Label hostIpLabel = new Label("Host IP:");
 	   private Label hostPortLabel = new Label("Host port:");
 	   private Label serverPortLabel = new Label("Server port:");
+	   private Label yourBoard = new Label("YOUR BOARD");
+
 	   private TextArea chatArea = new TextArea();
 	   private TextField hostIpField = new TextField();
 	   private TextField hostPortField = new TextField();
@@ -50,8 +52,8 @@ public class GameWindow extends Application{
  	   /**Initializing window: */
 	   
 	   private void setBoards(){
-		   int width = 35;
-		   int height = 35;
+		   int width = 30;
+		   int height = 30;
 		   for (int row = 0; row < 10; ++row) {
 		        for (int col = 0; col < 10; ++col) {
 		        	myBoard[row][col] = new Rectangle(20 + col*width,20+ row*height, width, height);
@@ -72,7 +74,7 @@ public class GameWindow extends Application{
 		   
 	   }
 	   private Parent setParent(){
-		   /** Buttons initialization: */
+		   //Buttons initialization:
 		   startServer.setPrefSize(150, 10);
 		   send.setPrefSize(150, 10);
 		   connect.setPrefSize(150, 10);
@@ -110,7 +112,7 @@ public class GameWindow extends Application{
 			    	GameController.sendMessage(messageStr);
 			    	}
 		   });
-		   /**TextField initialization: */
+		   //TextField initialization:
 		   chatField.setPrefSize(150, 10);
 		   hostIpField.setPrefSize(150, 10);
 		   hostPortField.setPrefSize(150, 10);
@@ -124,6 +126,10 @@ public class GameWindow extends Application{
 		   chatArea.setMaxSize(300, 100);
 		   chatArea.setMinSize(300, 100);
 		   chatArea.setEditable(false);
+		   
+		   //Labels:
+		   yourBoard.setPrefSize(100,10);
+		   yourBoard.setTextFill(Color.VIOLET);
 		   
 		   TilePane hostConnect = new TilePane(Orientation.HORIZONTAL);
 		   hostConnect.setAlignment(Pos.CENTER_RIGHT);
@@ -167,7 +173,8 @@ public class GameWindow extends Application{
 		   root.getChildren().addAll(configs,chat);
 		   
 		   GridPane.setConstraints(myBoardGroup, 0,  0, 1 , 1,HPos.CENTER, VPos.CENTER);
-		   root.getChildren().addAll(myBoardGroup);
+		   GridPane.setConstraints(yourBoard, 0, 0, 1, 1, HPos.CENTER, VPos.BOTTOM);
+		   root.getChildren().addAll(myBoardGroup,yourBoard);
 		   GridPane.setConstraints(enemyBoardGroup, 1,  0, 1 , 1,HPos.LEFT, VPos.CENTER);
 		   root.getChildren().addAll(enemyBoardGroup);
 		   //For debug:
