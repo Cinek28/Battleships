@@ -19,7 +19,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -129,7 +135,10 @@ public class GameWindow extends Application{
 		   
 		   //Labels:
 		   yourBoard.setPrefSize(100,10);
-		   yourBoard.setTextFill(Color.VIOLET);
+		   hostIpLabel.setTextFill(Color.RED);
+		   hostPortLabel.setTextFill(Color.RED);
+		   serverPortLabel.setTextFill(Color.RED);
+		   yourBoard.setTextFill(Color.YELLOW);
 		   
 		   TilePane hostConnect = new TilePane(Orientation.HORIZONTAL);
 		   hostConnect.setAlignment(Pos.CENTER_RIGHT);
@@ -164,7 +173,8 @@ public class GameWindow extends Application{
 		   chat.setHgap(1.0);
 		   chat.setVgap(1.0);
 		   chat.getChildren().addAll(chatt,messageSend);
-		   
+		   BackgroundImage image = new BackgroundImage(new Image("/View/battleship.jpg",800,600,false,true),
+				   BackgroundRepeat.NO_REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
 		   GridPane root = new GridPane();
 		   root.getColumnConstraints().add(new ColumnConstraints(400));
 		   root.getRowConstraints().add(new RowConstraints(350)); 
@@ -182,6 +192,7 @@ public class GameWindow extends Application{
 		   root.setPrefSize(800, 600);
 		   root.setMaxSize(800, 600);
 		   root.setMinSize(800, 600);
+		   root.setBackground(new Background(image));
 		   return root;
 	   }
 	   
