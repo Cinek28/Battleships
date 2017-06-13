@@ -7,7 +7,7 @@ public class Board {
 	private static final int SIZE = 10;
 	private Status boardState [][] = new Status[SIZE][SIZE];;
 	private Status enemyBoardState [][] = new Status[SIZE][SIZE];
-	private int noOfShipsActive = 0;
+	private int noOfShipsActive = 6;
 	private enum Direction {
 		HORIZONTAL,
 		VERTICAL
@@ -19,11 +19,14 @@ public class Board {
 				boardState[i][j] = Status.ISNOTSHIP;
 				enemyBoardState[i][j] = Status.UNKNOWN;
 			}
-		noOfShipsActive = 10;
+		noOfShipsActive = 6;
 	}
 	
 	public Status getStatus(int x, int y){
 		return boardState[x][y];
+	}
+	public Status getEnemyStatus(int x, int y){
+		return enemyBoardState[x][y];
 	}
 	public void setStatus(int x, int y, Status newStatus){
 		boardState[x][y] = newStatus;
@@ -47,18 +50,16 @@ public class Board {
 	public void setBoardRandom(){
 		Random generator = new Random();
 		boolean isOk = true;
-		int x, y, length, upperLeftX, upperLeftY, lowerRightX, lowerRightY;
+		int x, y, length = 0, upperLeftX, upperLeftY, lowerRightX, lowerRightY;
 		Direction direction;
-		for(int i = 0; i < 10;){
-			if(i < 4)
-				length = 1;
-			else if(i >=4 && i < 7)
-				length = 2;
-			else if(i >= 7 && i < 8)
+		for(int i = 0; i < 6;){
+			if(i < 1)
 				length = 3;
-			else
-				length = 4;
-			direction = (generator.nextInt(1) == 0 ? Direction.HORIZONTAL:Direction.VERTICAL);
+			else if(i >=1 && i < 3)
+				length = 2;
+			else if(i >= 3 && i < 6)
+				length = 1;
+			direction = (generator.nextInt(2) == 0 ? Direction.HORIZONTAL:Direction.VERTICAL);
 //			Horizontal:
 			if(direction == Direction.HORIZONTAL){
 				x = generator.nextInt(SIZE-length);
@@ -82,7 +83,10 @@ public class Board {
 					if(boardState[m][k] != Status.ISNOTSHIP){
 						isOk = false;
 						break;
-					}					
+					}
+					else{
+						isOk =true;
+					}
 				}
 			if(isOk == true){
 				for (int m = 0; m < length; ++m)
@@ -93,10 +97,11 @@ public class Board {
 					}
 			++i;
 			}
+			System.out.println(i);
 		}
 	}
 
-	public ShotStatus checkShot(int x, int y) {
+	public ShotStatus checkShot(int x, int y	) {
 		if (boardState[x][y] == Status.ISSHIP) {
 			if (checkIfDestroyed(x, y)) {
 				return ShotStatus.SHOT_AND_DESTROYED;
