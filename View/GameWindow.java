@@ -1,10 +1,11 @@
 package View;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -16,16 +17,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.TilePane;
+
+import Controller.*;
 
 
 public class GameWindow extends Application{
@@ -40,83 +38,126 @@ public class GameWindow extends Application{
 	   private Button send = new Button("Send message");
 	   private Button startServer = new Button("Start server");
  	   private Button connect = new Button("Connect to server");
-	   private GridPane enemyBoard = new GridPane();
-	   private GridPane myBoard = new GridPane();
+	   private Rectangle enemyBoard [][] = new Rectangle[10][10];
+	   private Rectangle myBoard [][] = new Rectangle[10][10];
  	   /**Initializing window: */
 	   private Parent setParent(){
 		   /** Buttons initialization: */
 		   startServer.setPrefSize(150, 10);
 		   send.setPrefSize(150, 10);
 		   connect.setPrefSize(150, 10);
+		   //Overriding button actions:
+		   
+		   startServer.setOnAction(new EventHandler<ActionEvent>() {
+			    @Override 
+			    public void handle(ActionEvent e) {
+//			    	String hostName = serverIpField.getText();
+			    	String serverPortStr = serverPort.getText();
+			    	GameController.startServer(serverPortStr);
+			    }
+		   });
+		   
+		   connect.setOnAction(new EventHandler<ActionEvent>() {
+			    @Override 
+			    public void handle(ActionEvent e) {
+			    	String hostIpStr = hostIpField.getText();
+			    	String hostPortStr = hostPortField.getText();
+			    	
+			    }
+		   });
+		   
+		   send.setOnAction(new EventHandler<ActionEvent>() {
+			    @Override 
+			    public void handle(ActionEvent e) {
+			    	String messageStr = chatField.getText();
+			    	
+			    	}
+		   });
 		   /**TextField initialization: */
 		   chatField.setPrefSize(150, 10);
 		   hostIpField.setPrefSize(150, 10);
 		   hostPortField.setPrefSize(150, 10);
 		   serverPort.setPrefSize(150, 10);
 		   chatArea.setPrefSize(300, 100);
+		   chatArea.setMaxSize(300, 100);
+		   chatArea.setMinSize(300, 100);
+		   chatArea.setEditable(false);
+		   
+		   Group myBoardGroup = new Group();
+		   Group enemyBoardGroup = new Group();
 		   
 		   TilePane hostConnect = new TilePane(Orientation.HORIZONTAL);
+		   hostConnect.setAlignment(Pos.CENTER_RIGHT);
 		   hostConnect.setHgap(1.0);
 		   hostConnect.setVgap(1.0);
-		   hostConnect.getChildren().addAll(hostPortLabel, hostPortField, connect);
+		   hostConnect.getChildren().addAll(hostPortLabel, hostPortField);
 		   TilePane hostIp = new TilePane(Orientation.HORIZONTAL);
+		   hostIp.setAlignment(Pos.CENTER_RIGHT);
 		   hostIp.setHgap(1.0);
 		   hostIp.setVgap(1.0);
 		   hostIp.getChildren().addAll(hostIpLabel, hostIpField);
 		   TilePane ip = new TilePane(Orientation.HORIZONTAL);
+ 		   ip.setAlignment(Pos.CENTER_RIGHT);
 		   ip.setHgap(1.0);
 		   ip.setVgap(1.0);
-		   ip.getChildren().addAll(serverPortLabel, serverPort, startServer);
+		   ip.getChildren().addAll(serverPortLabel, serverPort);
 		   TilePane configs = new TilePane(Orientation.VERTICAL);
 		   configs.setHgap(1.0);
 		   configs.setVgap(1.0);
-		   configs.getChildren().addAll(hostIp, hostConnect, ip);
+		   startServer.setAlignment(Pos.CENTER_RIGHT);
+		   connect.setAlignment(Pos.CENTER_RIGHT);
+		   HBox ss = new HBox(startServer,connect);
+		   ss.setAlignment(Pos.BOTTOM_RIGHT);
+		   configs.setAlignment(Pos.CENTER_RIGHT);
+		   configs.getChildren().addAll(hostIp, hostConnect, ip, ss);
 		   configs.setMaxWidth(200);
 		   TilePane messageSend = new TilePane(Orientation.HORIZONTAL);
 		   messageSend.setHgap(1.0);
 		   messageSend.setVgap(1.0);
 		   messageSend.getChildren().addAll(chatField, send);
+		   HBox chatt = new HBox(chatArea);
 		   TilePane chat = new TilePane(Orientation.VERTICAL);
+		   chat.setAlignment(Pos.CENTER_LEFT);
 		   chat.setHgap(1.0);
 		   chat.setVgap(1.0);
-		   chat.getChildren().addAll(chatArea,messageSend);
-
-		   myBoard.getColumnConstraints().add(new ColumnConstraints(7));
-		   myBoard.getRowConstraints().add(new RowConstraints(5));
-		   int width = 20;
-		   int height = 20;
-		   for (int r = 0; r < 15; r++) {
-		        for (int c = 0; c < 15; c++) {
-		        	Rectangle rectangle = new Rectangle(r*width, c*height, width, height);
-		        	rectangle.setFill(Color.GREEN);
-		        	rectangle.setStroke(Color.BLACK);
-		            myBoard.add(rectangle, c, r);
-		        }
-		    }
-		  
-		   enemyBoard.getColumnConstraints().add(new ColumnConstraints(7));
-		   enemyBoard.getRowConstraints().add(new RowConstraints(5));
-		   for (int r = 0; r < 15; r++) {
-		        for (int c = 0; c < 15; c++) {
-		        	Rectangle rectangle = new Rectangle(r*width, c*height, width, height);
-		        	rectangle.setFill(Color.GRAY);
-		        	rectangle.setStroke(Color.BLACK);
-		            enemyBoard.add(rectangle, c, r);
-		        }
-		   }
+		   chat.getChildren().addAll(chatt,messageSend);
 		   
 		   GridPane root = new GridPane();
-		   root.getColumnConstraints().add(new ColumnConstraints(500));
+		   root.getColumnConstraints().add(new ColumnConstraints(400));
 		   root.getRowConstraints().add(new RowConstraints(350)); 
-		   GridPane.setConstraints(configs, 0, 1);
-		   GridPane.setConstraints(chat,1,1);
-		   GridPane.setConstraints(myBoard, 0, 0, 10, 10, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS,new Insets(30,0,0,80));
-		   GridPane.setConstraints(enemyBoard, 1, 0, 10, 10, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS,new Insets(30,0,0,80));
-		   root.getChildren().addAll(configs,chat,myBoard,enemyBoard);
+		   GridPane.setConstraints(configs, 0, 1, 1, 1, HPos.RIGHT, VPos.CENTER );
+		   GridPane.setConstraints(chat,1,1,1,1,HPos.RIGHT,VPos.CENTER);
+		   root.getChildren().addAll(configs,chat);
+		   
+		   //Adding boards:
+		   
+		   int width = 35;
+		   int height = 35;
+		   for (int r = 0; r < 10; r++) {
+		        for (int c = 0; c < 10; c++) {
+		        	myBoard[r][c] = new Rectangle(20 + r*width,20+ c*height, width, height);
+		        	myBoard[r][c].setFill(Color.GREEN);
+		        	myBoard[r][c].setStroke(Color.BLACK);
+		        	myBoardGroup.getChildren().addAll(myBoard[r][c]);
+		            }
+		    }
+		  
+		   for (int r = 0; r < 10; r++) {
+		        for (int c = 0; c < 10; c++) {
+		        	enemyBoard[r][c] = new Rectangle(20 + r*width,20 + c*height, width, height);
+		        	enemyBoard[r][c].setFill(Color.GRAY);
+		        	enemyBoard[r][c].setStroke(Color.BLACK);
+		        	enemyBoardGroup.getChildren().addAll(enemyBoard[r][c]);
+		        }
+		   }
+		   GridPane.setConstraints(myBoardGroup, 0,  0, 1 , 1,HPos.CENTER, VPos.CENTER);
+		   root.getChildren().addAll(myBoardGroup);
+		   GridPane.setConstraints(enemyBoardGroup, 1,  0, 1 , 1,HPos.LEFT, VPos.CENTER);
+		   root.getChildren().addAll(enemyBoardGroup);
 		   root.setGridLinesVisible(true);
-		   root.setPrefSize(1000, 600);
-		   root.setMaxSize(1000, 600);
-		   root.setMinSize(1000, 600);
+		   root.setPrefSize(800, 600);
+		   root.setMaxSize(800, 600);
+		   root.setMinSize(800, 600);
 		   return root;
 	   }
 	   
@@ -128,21 +169,20 @@ public class GameWindow extends Application{
 		      primaryStage.setTitle("Battleships"); 
 		   
 		      //Adding the scene to Stage 
-		      primaryStage.setScene(new Scene(setParent())); 
+		      primaryStage.setScene(new Scene(setParent()));
+		      primaryStage.setResizable(false);
 		       
 		      //Displaying the contents of the stage 
 		      primaryStage.show(); 
 		   }
 	   
-	   public void setBoardColor(Color color, int x, int y, int whichBoard){
-		   Rectangle rect;
+	   public void setBoardColor(Color color, int row, int column, int whichBoard){
 		   if(whichBoard == 0){
-			   rect = (Rectangle)myBoard.getChildren().get(x+y*15);
+			   myBoard[row][column].setFill(color);;
 		   }
 		   else{
-			   rect = (Rectangle)enemyBoard.getChildren().get(x+y*15);
+			   enemyBoard[row][column].setFill(color);;
 		   }
-		   
 	   }
 	   
 	   public static void main(String args[]){           
