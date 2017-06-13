@@ -9,6 +9,9 @@ In folder Battleships (in terminal) type:
 javac Battleships.java
 java Battleships
 
+WARNING:
+Project is not finished! There is a problem with NullPtr exception.
+
 In game: 
 Server: Type port number you want to create server on and click start server.
 Wait for other player to connect.
