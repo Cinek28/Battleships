@@ -2,105 +2,111 @@ package Model;
 
 import java.util.Random;
 
-
 public class Board {
 	private static final int SIZE = 10;
-	private Status boardState [][] = new Status[SIZE][SIZE];;
-	private Status enemyBoardState [][] = new Status[SIZE][SIZE];
+	private Status boardState[][] = new Status[SIZE][SIZE];;
+	private Status enemyBoardState[][] = new Status[SIZE][SIZE];
 	private int noOfShipsActive = 6;
+
 	private enum Direction {
-		HORIZONTAL,
-		VERTICAL
+		HORIZONTAL, VERTICAL
 	}
-	
-	public Board(){
-		for(int i = 0; i < SIZE; ++i)
-			for(int j = 0; j < SIZE; ++j){
+
+	public Board() {
+		for (int i = 0; i < SIZE; ++i)
+			for (int j = 0; j < SIZE; ++j) {
 				boardState[i][j] = Status.ISNOTSHIP;
 				enemyBoardState[i][j] = Status.UNKNOWN;
 			}
 		noOfShipsActive = 8;
 	}
-	
-	public Status getStatus(int row, int col){
+
+	public Status getStatus(int row, int col) {
 		return boardState[row][col];
 	}
-	public Status getEnemyStatus(int row, int col){
+
+	public Status getEnemyStatus(int row, int col) {
 		return enemyBoardState[row][col];
 	}
-	public void setStatus(int row, int col, Status newStatus){
+
+	public void setStatus(int row, int col, Status newStatus) {
 		boardState[row][col] = newStatus;
 	}
-	public int getNoOfShipsActive(){
+
+	public int getNoOfShipsActive() {
 		return noOfShipsActive;
 	}
-	public void setNoOfShipsActive(int noOfShips){
+
+	public void setNoOfShipsActive(int noOfShips) {
 		noOfShipsActive = noOfShips;
 	}
-	public void clearBoard(){
-		for(int i = 0; i < SIZE; ++i)
-			for(int j = 0; j < SIZE; ++j)
-				boardState[i][j] = Status.ISNOTSHIP; 
+
+	public void clearBoard() {
+		for (int i = 0; i < SIZE; ++i)
+			for (int j = 0; j < SIZE; ++j)
+				boardState[i][j] = Status.ISNOTSHIP;
 	}
-	public void clearEnemyBoard(){
-		for(int i = 0; i < SIZE; ++i)
-			for(int j = 0; j < SIZE; ++j)
-				enemyBoardState[i][j] = Status.UNKNOWN; 
+
+	public void clearEnemyBoard() {
+		for (int i = 0; i < SIZE; ++i)
+			for (int j = 0; j < SIZE; ++j)
+				enemyBoardState[i][j] = Status.UNKNOWN;
 	}
-	public void setBoardRandom(){
+
+	public void setBoardRandom() {
 		Random generator = new Random();
 		boolean isOk = true;
 		int x, y, length = 0, upperLeftX, upperLeftY, lowerRightX, lowerRightY;
 		Direction direction;
-		for(int i = 0; i < 7;){
-			if(i < 1)
+		for (int i = 0; i < 7;) {
+			if (i < 1)
 				length = 4;
-			else if(i >=1 && i < 3)
+			else if (i >= 1 && i < 3)
 				length = 3;
-			else if(i >= 3 && i < 5)
+			else if (i >= 3 && i < 5)
 				length = 2;
 			else
 				length = 1;
-			direction = (generator.nextInt(2) == 0 ? Direction.HORIZONTAL:Direction.VERTICAL);
-//			Horizontal:
-			if(direction == Direction.HORIZONTAL){
-				x = generator.nextInt(SIZE-length);
+			direction = (generator.nextInt(2) == 0 ? Direction.HORIZONTAL : Direction.VERTICAL);
+			// Horizontal:
+			if (direction == Direction.HORIZONTAL) {
+				x = generator.nextInt(SIZE - length);
 				y = generator.nextInt(SIZE);
-				upperLeftX = Math.max(0,x-1);
-				upperLeftY = Math.max(0,y-1);
-				lowerRightX = Math.min(SIZE-1,x+length+1);
-				lowerRightY = Math.min(SIZE-1,y+1);
+				upperLeftX = Math.max(0, x - 1);
+				upperLeftY = Math.max(0, y - 1);
+				lowerRightX = Math.min(SIZE - 1, x + length + 1);
+				lowerRightY = Math.min(SIZE - 1, y + 1);
 			}
-//			Vertical:
-			else{
+			// Vertical:
+			else {
 				x = generator.nextInt(SIZE);
-				y = generator.nextInt(SIZE-length);
-				upperLeftX = Math.max(0,x-1);
-				upperLeftY = Math.max(0,y-1);
-				lowerRightX = Math.min(SIZE-1,x+1);
-				lowerRightY = Math.min(SIZE-1,y+length+1);
+				y = generator.nextInt(SIZE - length);
+				upperLeftX = Math.max(0, x - 1);
+				upperLeftY = Math.max(0, y - 1);
+				lowerRightX = Math.min(SIZE - 1, x + 1);
+				lowerRightY = Math.min(SIZE - 1, y + length + 1);
 			}
-			for(int row = upperLeftY; row <= lowerRightY;row++)
-				for(int col = upperLeftX; col <= lowerRightX;col++){
-					if(boardState[row][col] != Status.ISNOTSHIP){
+			for (int row = upperLeftY; row <= lowerRightY; row++)
+				for (int col = upperLeftX; col <= lowerRightX; col++) {
+					if (boardState[row][col] != Status.ISNOTSHIP) {
 						isOk = false;
 						break;
 					}
 				}
-			if(isOk == true){
+			if (isOk == true) {
 				for (int l = 0; l < length; ++l)
 					if (direction == Direction.HORIZONTAL) {
-						boardState[y][x+l] = Status.ISSHIP;
+						boardState[y][x + l] = Status.ISSHIP;
 					} else {
 						boardState[y + l][x] = Status.ISSHIP;
 					}
-			++i;
+				++i;
 			}
-			isOk =true;
+			isOk = true;
 		}
 	}
 
-	public ShotStatus checkShot(int x, int y	) {
+	public ShotStatus checkShot(int x, int y) {
 		if (boardState[x][y] == Status.ISSHIP) {
 			if (checkIfDestroyed(x, y)) {
 				return ShotStatus.SHOT_AND_DESTROYED;
@@ -126,26 +132,22 @@ public class Board {
 
 	private boolean checkIfDestroyed(int x, int y) {
 		int i = x;
-		while (--i >= 0
-				&& (boardState[i][y] == Status.ISSHIP || boardState[i][y] == Status.SHOT))
+		while (--i >= 0 && (boardState[i][y] == Status.ISSHIP || boardState[i][y] == Status.SHOT))
 			if (boardState[i][y] == Status.ISSHIP)
 				return false;
 
 		i = x;
-		while (++i < SIZE
-				&& (boardState[i][y] == Status.ISSHIP || boardState[i][y] == Status.SHOT))
+		while (++i < SIZE && (boardState[i][y] == Status.ISSHIP || boardState[i][y] == Status.SHOT))
 			if (boardState[i][y] == Status.ISSHIP)
 				return false;
 
 		i = y;
-		while (--i >= 0
-				&& (boardState[x][i] == Status.ISSHIP || boardState[x][i] == Status.SHOT))
+		while (--i >= 0 && (boardState[x][i] == Status.ISSHIP || boardState[x][i] == Status.SHOT))
 			if (boardState[x][i] == Status.ISSHIP)
 				return false;
 
 		i = y;
-		while (++i < SIZE
-				&& (boardState[x][i] == Status.ISSHIP || boardState[x][i] == Status.SHOT))
+		while (++i < SIZE && (boardState[x][i] == Status.ISSHIP || boardState[x][i] == Status.SHOT))
 			if (boardState[x][i] == Status.ISSHIP)
 				return false;
 
@@ -179,5 +181,5 @@ public class Board {
 				if (boardState[i][j] == Status.SHOT)
 					boardState[i][j] = Status.SHIPDESTROYED;
 	}
-	
+
 }

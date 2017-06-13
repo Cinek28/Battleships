@@ -49,8 +49,7 @@ public class Client {
 		if (connection.messagesQueue.isEmpty()) {
 			return null;
 		} else {
-			GameEvent ge = new GameEvent((String) connection.messagesQueue
-					.getFirst());
+			GameEvent ge = new GameEvent((String) connection.messagesQueue.getFirst());
 			connection.messagesQueue.removeFirst();
 			return ge;
 		}
