@@ -46,22 +46,26 @@ public class GameWindow extends Application {
 	private TextField chatField = new TextField();
 	private TextField serverPort = new TextField();
 	private TextField statusField = new TextField("Welcome!");
-	private Button send = new Button("Send message");
-	private Button startServer = new Button("Start server");
-	private Button connect = new Button("Connect to server");
+	public Button send = new Button("Send message");
+	public Button startServer = new Button("Start server");
+	public Button connect = new Button("Connect to server");
 	private Rectangle enemyBoard[][] = new Rectangle[10][10];
 	private Rectangle myBoard[][] = new Rectangle[10][10];
 	private Group myBoardGroup = new Group();
 	private Group enemyBoardGroup = new Group();
 
 	/** Initializing window: */
-
+	
+	public GameWindow(){
+		setBoards();
+	}
+	
 	private void setBoards() {
 		int width = 30;
 		int height = 30;
 		for (int row = 0; row < 10; ++row) {
 			for (int col = 0; col < 10; ++col) {
-				myBoard[row][col] = new Rectangle(20 + col * width, 20 + row * height, width, height);
+				myBoard[row][col] = new Rectangle(col * width, row * height, width, height);
 				myBoard[row][col].setFill(Color.GREEN);
 				myBoard[row][col].setStroke(Color.BLACK);
 				myBoardGroup.getChildren().addAll(myBoard[row][col]);
@@ -70,7 +74,7 @@ public class GameWindow extends Application {
 
 		for (int row = 0; row < 10; ++row) {
 			for (int col = 0; col < 10; ++col) {
-				enemyBoard[row][col] = new Rectangle(20 + col * width, 20 + row * height, width, height);
+				enemyBoard[row][col] = new Rectangle(col * width,row * height, width, height);
 				enemyBoard[row][col].setFill(Color.GRAY);
 				enemyBoard[row][col].setStroke(Color.BLACK);
 				enemyBoardGroup.getChildren().addAll(enemyBoard[row][col]);
@@ -87,37 +91,17 @@ public class GameWindow extends Application {
 		startServer.setAlignment(Pos.CENTER);
 		send.setAlignment(Pos.CENTER);
 		connect.setAlignment(Pos.CENTER);
+		
+		startServer.setOnAction(new GameController(this)::handleActionEvent);
+
+		connect.setOnAction(new GameController(this)::handleActionEvent);
+
+		send.setOnAction(new GameController(this)::handleActionEvent);
+
+		
 		// Boards:
-		setBoards();
-		GameController.repaintBoard(this, 0);
-		GameController.repaintBoard(this, 1);
-		// Overriding button actions:
+//		setBoards();
 
-		startServer.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				String serverPortStr = serverPort.getText();
-				GameController.startServer(serverPortStr);
-				// setBoards();
-			}
-		});
-
-		connect.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				String hostIpStr = hostIpField.getText();
-				String hostPortStr = hostPortField.getText();
-				GameController.connectToServer(hostIpStr, hostPortStr);
-			}
-		});
-
-		send.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				String messageStr = chatField.getText();
-				GameController.sendMessage(messageStr);
-			}
-		});
 		// TextField initialization:
 		chatField.setPrefSize(150, 10);
 		hostIpField.setPrefSize(150, 10);
@@ -181,7 +165,10 @@ public class GameWindow extends Application {
 		GridPane.setConstraints(configs, 0, 1, 1, 1, HPos.RIGHT, VPos.CENTER);
 		GridPane.setConstraints(chat, 1, 1, 1, 1, HPos.RIGHT, VPos.CENTER);
 		root.getChildren().addAll(configs, chat);
-
+		
+		//Adding mouse event handler to board group:
+		myBoardGroup.setOnMouseClicked(new GameController(this)::handleMouseEvent);
+		
 		GridPane.setConstraints(myBoardGroup, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
 		GridPane.setConstraints(yourBoard, 0, 0, 1, 1, HPos.CENTER, VPos.BOTTOM);
 		root.getChildren().addAll(myBoardGroup, yourBoard);
@@ -203,15 +190,13 @@ public class GameWindow extends Application {
 
 		Scene scene = new Scene(setParent());
 
-		scene.setOnMousePressed(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-			}
-		});
 		// Adding the scene to Stage
 		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
-
+		
+		//Adding icon to stage:
+		primaryStage.getIcons().add(new Image("/View/battleship.jpg"));
+		
 		// Displaying the contents of the stage
 		primaryStage.show();
 
@@ -224,8 +209,29 @@ public class GameWindow extends Application {
 			enemyBoard[row][column].setFill(color);
 		}
 	}
+	public String getChatMsg(){
+		return chatField.getText();
+	}
+	public void sendChatMsg(){
+		System.out.println("TODO");
+	}
 
 	public static void main(String args[]) {
 		launch(args);
 	}
+
+	public String getHostPort() {
+		
+		return hostPortField.getText();
+	}
+	
+	public String getHostIp() {
+		
+		return hostIpField.getText();
+	}
+
+	public String getServerPort() {
+		return serverPort.getText();
+	}
+	
 }

@@ -2,54 +2,75 @@ package Controller;
 
 import Model.*;
 import View.*;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class GameController {
-	public static GameModel model = new GameModel();
-
-	public void initGame(GameWindow window) {
-		model.gameBoard.clearEnemyBoard();
-		model.gameBoard.clearBoard();
-		model.gameBoard.setBoardRandom();
-		repaintBoard(window, 0);
-		repaintBoard(window, 1);
+public class GameController implements EventHandler<Event>{
+	private static GameModel model;
+    private static GameWindow view; 
+    
+    public GameController(GameWindow view){
+    	GameController.view = view;
+    }
+    
+	public void initGame(GameModel model) {
+		GameController.model = model;
+		GameController.model.gameBoard.clearEnemyBoard();
+		GameController.model.gameBoard.clearBoard();
+		GameController.model.gameBoard.setBoardRandom();
+//		repaintBoard(0);
+//		repaintBoard(1);
+		
 	}
 
-	public static void repaintBoard(GameWindow view, int whichBoard) {
+	public void repaintBoard(int whichBoard) {
 		Status checkStatus;
 		for (int row = 0; row < 10; ++row) {
 			for (int col = 0; col < 10; ++col) {
 				if (whichBoard == 0) {
-					checkStatus = model.gameBoard.getStatus(row, col);
+					checkStatus = GameController.model.gameBoard.getStatus(row, col);
 				} else {
-					checkStatus = model.gameBoard.getEnemyStatus(row, col);
+					checkStatus = GameController.model.gameBoard.getEnemyStatus(row, col);
 				}
 				if (checkStatus == Status.MISSED)
-					view.setBoardColor(Color.YELLOW, row, col, whichBoard);
+					GameController.view.setBoardColor(Color.YELLOW, row, col, whichBoard);
 				else if (checkStatus == Status.ISSHIP)
-					view.setBoardColor(Color.RED, row, col, whichBoard);
+					GameController.view.setBoardColor(Color.RED, row, col, whichBoard);
 				else if (checkStatus == Status.ISNOTSHIP) {
-					view.setBoardColor(Color.BLUE, row, col, whichBoard);
+					GameController.view.setBoardColor(Color.BLUE, row, col, whichBoard);
 				} else if (checkStatus == Status.SHIPDESTROYED)
-					view.setBoardColor(Color.BLACK, row, col, whichBoard);
+					GameController.view.setBoardColor(Color.BLACK, row, col, whichBoard);
 				else if (checkStatus == Status.UNKNOWN)
-					view.setBoardColor(Color.GRAY, row, col, whichBoard);
+					GameController.view.setBoardColor(Color.GRAY, row, col, whichBoard);
 			}
 		}
 	}
+	
+    public void handleActionEvent(ActionEvent event){
+        //handle buttons events event:
+    	Object eventSource = event.getSource();
+    	if(GameController.view.startServer.equals(eventSource)){
+    		System.out.println("XXXX");
+    	}
+    	
+    }
 
-	public static void startServer(String serverPortStr) {
-
+	public void handleMouseEvent(MouseEvent event) {
+		int x = (int) event.getX();
+		int y = (int) event.getY();
+		repaintBoard(0);
+		repaintBoard(1);
+		
 	}
 
-	public static void sendMessage(String messageStr) {
+	@Override
+	public void handle(Event event) {
 
 	}
-
-	public static void connectToServer(String hostIp, String hostPort) {
-
-	}
-
 }
