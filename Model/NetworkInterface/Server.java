@@ -68,4 +68,8 @@ public class Server {
 	public int getConnectionsCount() {
 		return connections.size();
 	}
+	
+	public void setPort(int port){
+		this.port = port;
+	}
 }

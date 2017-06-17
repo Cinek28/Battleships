@@ -7,14 +7,8 @@ import View.GameWindow;
 import Controller.GameController;
 
 public class BattleshipsGame {
-	private Client client = new Client("Default", "127.0.0.1", 8080);
-	private Server server = new Server(8080);
-
-	public String getID() {
-		return client.getPlayerID();
-	}
-
 	public static void main(String args[]) {
+		//Setting up a view thread:
 		new Thread() {
 			@Override
 			public void run() {

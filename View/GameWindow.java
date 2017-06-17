@@ -92,15 +92,13 @@ public class GameWindow extends Application {
 		send.setAlignment(Pos.CENTER);
 		connect.setAlignment(Pos.CENTER);
 		
+		//Buttons setting handlers for actions:
+		
 		startServer.setOnAction(new GameController(this)::handleActionEvent);
 
 		connect.setOnAction(new GameController(this)::handleActionEvent);
 
 		send.setOnAction(new GameController(this)::handleActionEvent);
-
-		
-		// Boards:
-//		setBoards();
 
 		// TextField initialization:
 		chatField.setPrefSize(150, 10);
@@ -108,9 +106,9 @@ public class GameWindow extends Application {
 		hostPortField.setPrefSize(150, 10);
 		serverPort.setPrefSize(150, 10);
 		statusField.setEditable(false);
-		statusField.setPrefSize(300, 20);
-		statusField.setMaxSize(300, 20);
-		statusField.setMinSize(300, 20);
+		statusField.setPrefSize(600, 20);
+		statusField.setMaxSize(600, 20);
+		statusField.setMinSize(600, 20);
 		statusField.setAlignment(Pos.CENTER_RIGHT);
 		chatArea.setPrefSize(300, 100);
 		chatArea.setMaxSize(300, 100);
@@ -167,7 +165,7 @@ public class GameWindow extends Application {
 		root.getChildren().addAll(configs, chat);
 		
 		//Adding mouse event handler to board group:
-		myBoardGroup.setOnMouseClicked(new GameController(this)::handleMouseEvent);
+		enemyBoardGroup.setOnMouseClicked(new GameController(this)::handleMouseEvent);
 		
 		GridPane.setConstraints(myBoardGroup, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
 		GridPane.setConstraints(yourBoard, 0, 0, 1, 1, HPos.CENTER, VPos.BOTTOM);
@@ -232,6 +230,9 @@ public class GameWindow extends Application {
 
 	public String getServerPort() {
 		return serverPort.getText();
+	}
+	public void setStatus(String message){
+		statusField.setText(message);
 	}
 	
 }

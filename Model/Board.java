@@ -6,7 +6,7 @@ public class Board {
 	private static final int SIZE = 10;
 	private Status boardState[][] = new Status[SIZE][SIZE];;
 	private Status enemyBoardState[][] = new Status[SIZE][SIZE];
-	private int noOfShipsActive = 6;
+	private int noOfShipsActive = 8;
 
 	private enum Direction {
 		HORIZONTAL, VERTICAL
@@ -159,27 +159,27 @@ public class Board {
 		int x2 = x;
 		int y1 = y;
 		int y2 = y;
-
 		while (x1 > 0 && boardState[x1][y] == Status.SHOT) {
 			x1--;
 		}
 
-		while (x2 < 14 && (boardState[x2][y] == Status.SHOT)) {
+		while (x2 < 14 && (enemyBoardState[x2][y] == Status.SHOT)) {
 			x2++;
 		}
 
-		while (y1 > 0 && boardState[x][y1] == Status.SHOT) {
+		while (y1 > 0 && enemyBoardState[x][y1] == Status.SHOT) {
 			y1--;
 		}
 
-		while (y2 < 14 && (boardState[x][y2] == Status.SHOT)) {
+		while (y2 < 14 && (enemyBoardState[x][y2] == Status.SHOT)) {
 			y2++;
 		}
 
 		for (int i = x1; i <= x2; i++)
 			for (int j = y1; j <= y2; j++)
-				if (boardState[i][j] == Status.SHOT)
-					boardState[i][j] = Status.SHIPDESTROYED;
+				if (enemyBoardState[i][j] == Status.SHOT)
+					enemyBoardState[i][j] = Status.SHIPDESTROYED;
+
 	}
 
 }
