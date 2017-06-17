@@ -118,14 +118,22 @@ public class Board {
 		}
 	}
 
-	public void setShot(int x, int y, ShotStatus result) {
+	public void setShot(int x, int y, ShotStatus result, ActualPlayer whichPlayer) {
 		if (result == ShotStatus.MISSED) {
-			boardState[x][y] = Status.MISSED;
+			if (whichPlayer == ActualPlayer.PLAYER) {
+				boardState[x][y] = Status.MISSED;
+			} else {
+				enemyBoardState[x][y] = Status.MISSED;
+			}
 		} else {
-			boardState[x][y] = Status.SHOT;
-
+			if (whichPlayer == ActualPlayer.PLAYER) {
+				boardState[x][y] = Status.SHOT;
+			} else {
+				enemyBoardState[x][y] = Status.SHOT;
+			}
 			if (result == ShotStatus.SHOT_AND_DESTROYED) {
-				setDestroyed(x, y);
+				setDestroyed(x, y, whichPlayer);
+				--noOfShipsActive;
 			}
 		}
 	}
@@ -154,32 +162,54 @@ public class Board {
 		return true;
 	}
 
-	private void setDestroyed(int x, int y) {
+	private void setDestroyed(int x, int y, ActualPlayer whichPlayer) {
 		int x1 = x;
 		int x2 = x;
 		int y1 = y;
 		int y2 = y;
-		while (x1 > 0 && boardState[x1][y] == Status.SHOT) {
-			x1--;
+		if (whichPlayer == ActualPlayer.PLAYER) {
+			while (x1 > 0 && boardState[x1][y] == Status.SHOT) {
+				x1--;
+			}
+
+			while (x2 < 14 && (boardState[x2][y] == Status.SHOT)) {
+				x2++;
+			}
+
+			while (y1 > 0 && boardState[x][y1] == Status.SHOT) {
+				y1--;
+			}
+
+			while (y2 < 14 && (boardState[x][y2] == Status.SHOT)) {
+				y2++;
+			}
+
+			for (int i = x1; i <= x2; i++)
+				for (int j = y1; j <= y2; j++)
+					if (boardState[i][j] == Status.SHOT)
+						boardState[i][j] = Status.SHIPDESTROYED;
+		} else {
+			while (x1 > 0 && enemyBoardState[x1][y] == Status.SHOT) {
+				x1--;
+			}
+
+			while (x2 < 14 && (enemyBoardState[x2][y] == Status.SHOT)) {
+				x2++;
+			}
+
+			while (y1 > 0 && enemyBoardState[x][y1] == Status.SHOT) {
+				y1--;
+			}
+
+			while (y2 < 14 && (enemyBoardState[x][y2] == Status.SHOT)) {
+				y2++;
+			}
+
+			for (int i = x1; i <= x2; i++)
+				for (int j = y1; j <= y2; j++)
+					if (enemyBoardState[i][j] == Status.SHOT)
+						enemyBoardState[i][j] = Status.SHIPDESTROYED;
 		}
-
-		while (x2 < 14 && (enemyBoardState[x2][y] == Status.SHOT)) {
-			x2++;
-		}
-
-		while (y1 > 0 && enemyBoardState[x][y1] == Status.SHOT) {
-			y1--;
-		}
-
-		while (y2 < 14 && (enemyBoardState[x][y2] == Status.SHOT)) {
-			y2++;
-		}
-
-		for (int i = x1; i <= x2; i++)
-			for (int j = y1; j <= y2; j++)
-				if (enemyBoardState[i][j] == Status.SHOT)
-					enemyBoardState[i][j] = Status.SHIPDESTROYED;
-
 	}
 
 }

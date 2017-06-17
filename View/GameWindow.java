@@ -180,7 +180,7 @@ public class GameWindow extends Application {
 		root.setBackground(new Background(image));
 		return root;
 	}
-
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		// Setting the title to Stage.
@@ -199,6 +199,11 @@ public class GameWindow extends Application {
 		primaryStage.show();
 
 	}
+	
+	@Override
+	public void stop(){
+		
+	}
 
 	public void setBoardColor(Color color, int row, int column, int whichBoard) {
 		if (whichBoard == 0) {
@@ -210,14 +215,10 @@ public class GameWindow extends Application {
 	public String getChatMsg(){
 		return chatField.getText();
 	}
-	public void sendChatMsg(){
-		System.out.println("TODO");
+	public void addToChat(String message){
+		chatArea.appendText(message + "\n");
 	}
-
-	public static void main(String args[]) {
-		launch(args);
-	}
-
+	
 	public String getHostPort() {
 		
 		return hostPortField.getText();
@@ -233,6 +234,13 @@ public class GameWindow extends Application {
 	}
 	public void setStatus(String message){
 		statusField.setText(message);
+	}
+	public void clearChatField(){
+		chatField.clear();
+	}
+
+	public static void main(String args[]) {
+		launch(args);
 	}
 	
 }
