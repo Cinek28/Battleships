@@ -197,6 +197,15 @@ public class GameWindow extends Application {
 		
 		// Displaying the contents of the stage
 		primaryStage.show();
+		
+		//Handling exit:
+	    primaryStage.setOnCloseRequest(new EventHandler<javafx.stage.WindowEvent>(){
+			@Override
+			public void handle(javafx.stage.WindowEvent event) {
+				Platform.exit();
+		        System.exit(0);
+			}
+	    });
 
 	}
 	
@@ -216,7 +225,7 @@ public class GameWindow extends Application {
 		return chatField.getText();
 	}
 	public void addToChat(String message){
-		chatArea.appendText(message + "\n");
+		chatArea.appendText(message);
 	}
 	
 	public String getHostPort() {

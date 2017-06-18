@@ -3,6 +3,7 @@ package Controller;
 import Model.*;
 import Model.NetworkInterface.Client;
 import Model.NetworkInterface.GameEvent;
+import Model.NetworkInterface.Server;
 import View.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -72,10 +73,12 @@ public class GameController implements EventHandler<Event> {
 					GameController.view.setStatus("Setting up server on port: " + serverPort);
 					GameController.model.server.setPort(Integer.parseInt(serverPort));
 					GameController.model.client = new Client("Server", "127.0.0.1", Integer.parseInt(serverPort));
+					System.out.println(GameController.model.getID());
 				} else {
 					GameController.view.setStatus("Setting up server on default port: 8081");
 					GameController.model.server.setPort(8081);
 					GameController.model.client = new Client("Server", "127.0.0.1", 8081);
+					System.out.println(GameController.model.getID());
 				}
 				if (GameController.model.server.start()) {
 					if (GameController.model.client.start()) {
@@ -104,10 +107,12 @@ public class GameController implements EventHandler<Event> {
 			if (!(GameController.model.client.isAlive())) {
 				if (!(hostIP.equals("") && hostPort.equals(""))) {
 					GameController.view.setStatus("Connecting to: " + hostIP + " on port " + hostPort);
-					GameController.model.client = new Client("Default", hostIP, Integer.parseInt(hostPort));
+					GameController.model.client = new Client("Client", hostIP, Integer.parseInt(hostPort));
+					GameController.model.server = new Server(Integer.parseInt(hostPort));
 				} else {
 					GameController.view.setStatus("Connecting to local server: 127.0.0.1. on port 8081");
-					GameController.model.client = new Client("Default", hostIP, 8081);
+					GameController.model.client = new Client("Client", hostIP, 8081);
+					GameController.model.server = new Server(8081);
 				}
 				if (GameController.model.client.start()) {
 					GameController.view.connect.setText("Disconnect");
@@ -127,28 +132,33 @@ public class GameController implements EventHandler<Event> {
 		} else if (GameController.view.send.equals(eventSource)) {
 			String message = GameController.view.getChatMsg();
 			if (!message.equals("") && GameController.model.client.isAlive()) {
-				GameEvent ge = new GameEvent(GameEvent.C_CHAT_MSG, message);
+				GameEvent ge = new GameEvent(GameEvent.C_CHAT_MSG, message, GameController.model.client.getPlayerID());
 				try {
 					GameController.model.client.sendMessage(ge);
 				} catch (Exception e) {
 					GameController.view.setStatus("Message not sent");
 				}
-				addToChat(message);
+//				addToChat(message);
 				GameController.view.clearChatField();
 			}
 		}
 	}
 
 	public void handleMouseEvent(MouseEvent event) {
-		int x = ((int) event.getX())/30;
-		int y = ((int) event.getY())/30;
-		if (GameController.model.client.isAlive()) {
-			GameEvent ge = new GameEvent(GameEvent.C_SHOT);
-			ge.setMessage(x+"|"+y);
-			try {
-				GameController.model.client.sendMessage(ge);
-			} catch (Exception e) {
-				GameController.view.setStatus("Shot not sent");
+		int x = ((int) event.getX()) / 30;
+		int y = ((int) event.getY()) / 30;
+		if (GameController.model.client.isAlive() && GameController.model.getGameStatus() == GameStatus.STARTED) {
+			if (GameController.model.getWhoseTurn() == ActualPlayer.PLAYER) {
+				GameEvent ge = new GameEvent(GameEvent.C_SHOT);
+				ge.setMessage(x + "|" + y);
+				try {
+					GameController.model.client.sendMessage(ge);
+				} catch (Exception e) {
+					GameController.view.setStatus("Shot not sent");
+				}
+				GameController.model.changeTurn();
+			} else {
+				GameController.view.setStatus("Not your turn");
 			}
 		}
 		repaintBoard(0);

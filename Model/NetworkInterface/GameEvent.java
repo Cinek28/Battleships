@@ -106,6 +106,12 @@ public class GameEvent {
 		this(type);
 		this.message = message;
 	}
+	
+	public GameEvent(int type, String message, String sender) {
+		this(type);
+		this.message = message;
+		this.playerId = sender;
+	}
 
 	public GameEvent(String receivedMessage) {
 		String x = receivedMessage;
