@@ -28,6 +28,7 @@ public class BattleshipsGame {
 				while (true) {
 						if (GameController.model.client != null && GameController.model.client.isAlive()) {
 							GameEvent ge;
+							System.out.println(GameController.model.client.getPlayerID());
 							while (model.client != null && model.client.isAlive()
 									&& (ge = model.client.receiveMessage()) != null) {
 								System.out.println(ge.getMessage());
@@ -93,7 +94,7 @@ public class BattleshipsGame {
 										int idx1 = s.indexOf('|');
 										String a = s.substring(0, idx1);
 										String b = s.substring(idx1 + 1);
-
+										System.out.println(a + " " + b);
 										try {
 											int x = Integer.parseInt(a);
 											int y = Integer.parseInt(b);
@@ -133,6 +134,8 @@ public class BattleshipsGame {
 											} else {
 												mainGame.view.setStatus("Enemy missed");
 											}
+											mainGame.model.changeTurn();
+											System.out.println(mainGame.model.getWhoseTurn());
 										} else {
 											if (w == ShotStatus.SHOT) {
 												if (model.getID().compareTo(ge.getPlayerId()) != 0) {
@@ -173,13 +176,13 @@ public class BattleshipsGame {
 							}
 						} else if (!GameController.model.client.isAlive()) {
 							GameController.model.client.stop();
+							GameController.view.connect.setText("Connect");
 							if (GameController.model.server.isRunning()) {
 								GameController.model.server.stop();
 								GameController.view.connect.setDisable(false);
 								GameController.view.startServer.setText("Start server");
 							} else {
 								GameController.view.startServer.setDisable(false);
-								GameController.view.connect.setText("Connect");
 							}
 							GameController.view.setStatus("Broken connection");
 							// GameController.model.client = null;

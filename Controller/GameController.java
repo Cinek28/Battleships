@@ -28,6 +28,7 @@ public class GameController implements EventHandler<Event> {
 		GameController.model.gameBoard.clearBoard();
 		GameController.model.gameBoard.setBoardRandom();
 		GameController.model.resetNumberOfShips();
+		GameController.model.setGameStatus(GameStatus.INIT);
 		// repaintBoard(0);
 		// repaintBoard(1);
 
@@ -84,8 +85,10 @@ public class GameController implements EventHandler<Event> {
 					if (GameController.model.client.start()) {
 						GameController.view.connect.setDisable(true);
 						GameController.view.startServer.setText("Disconnect");
+						System.out.println("Ok");
 					} else {
 						GameController.view.setStatus("Problem starting client, disconnecting server");
+						System.out.println("Server client disconnected");
 						GameController.model.server.stop();
 					}
 				} else {
@@ -118,11 +121,15 @@ public class GameController implements EventHandler<Event> {
 					GameController.view.connect.setText("Disconnect");
 					GameController.view.startServer.setDisable(true);
 					GameController.view.setStatus("Connected to server");
+					GameController.model.setGameStatus(GameStatus.STARTED);
+					GameController.model.setStartingPlayer();
 				} else {
 					GameController.view.setStatus("Can't connect to server");
+					System.out.println("Can't connect to server");
 				}
 
 			} else {
+				System.out.println("Disconnected from server");
 				GameController.model.client.stop();
 				GameController.view.connect.setText("Connect");
 				GameController.view.startServer.setDisable(false);
@@ -138,8 +145,8 @@ public class GameController implements EventHandler<Event> {
 				} catch (Exception e) {
 					GameController.view.setStatus("Message not sent");
 				}
-//				addToChat(message);
 				GameController.view.clearChatField();
+				GameController.view.setStatus("Message sent");
 			}
 		}
 	}
@@ -147,6 +154,7 @@ public class GameController implements EventHandler<Event> {
 	public void handleMouseEvent(MouseEvent event) {
 		int x = ((int) event.getX()) / 30;
 		int y = ((int) event.getY()) / 30;
+		System.out.println(x + " " + y);
 		if (GameController.model.client.isAlive() && GameController.model.getGameStatus() == GameStatus.STARTED) {
 			if (GameController.model.getWhoseTurn() == ActualPlayer.PLAYER) {
 				GameEvent ge = new GameEvent(GameEvent.C_SHOT);

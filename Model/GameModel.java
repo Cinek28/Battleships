@@ -14,6 +14,9 @@ public class GameModel {
 	public GameStatus getGameStatus() {
 		return Status;
 	}
+	public void setGameStatus(GameStatus status){
+		Status = status;
+	}
 
 	public ActualPlayer getWhoseTurn() {
 		return WhoseTurn;
@@ -28,7 +31,7 @@ public class GameModel {
 	}
 
 	public void setStartingPlayer() {
-
+		WhoseTurn = ActualPlayer.PLAYER;
 	}
 
 	public String getID() {
