@@ -5,6 +5,7 @@ import Model.NetworkInterface.Client;
 import Model.NetworkInterface.GameEvent;
 import Model.NetworkInterface.Server;
 import View.*;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
@@ -63,33 +64,56 @@ public class GameController implements EventHandler {
 			String hostPort = this.view.getHostPort();
 			if (!(this.model.client.isAlive())) {
 				if (!(hostIP.equals("") && hostPort.equals(""))) {
-					this.view.setStatus("Connecting to: " + hostIP + " on port " + hostPort);
+					Platform.runLater(new Runnable() {
+					    @Override public void run() {
+					    	view.setStatus("Connecting to: " + hostIP + " on port " + hostPort);
+					    }
+					});
 					this.model.client = new Client("Client", hostIP, Integer.parseInt(hostPort));
 					this.model.server = new Server(Integer.parseInt(hostPort));
 				} else {
-					this.view.setStatus("Connecting to local server: 127.0.0.1. on port 8081");
+					Platform.runLater(new Runnable() {
+					    @Override public void run() {
+					    	view.setStatus("Connecting to local server: 127.0.0.1. on port 8081");
+					    }
+					});
+					
 					this.model.client = new Client("Client", hostIP, 8081);
 					this.model.server = new Server(8081);
 				}
 				if (this.model.client.start()) {
-					this.view.connect.setText("Disconnect");
-					this.view.startServer.setDisable(true);
-					this.view.setStatus("Connected to server");
+					Platform.runLater(new Runnable() {
+					    @Override public void run() {
+					    	view.connect.setText("Disconnect");
+							view.startServer.setDisable(true);
+							view.setStatus("Connected to server");
+					    }
+					});
+					
 					GameEvent ge = new GameEvent(GameEvent.C_READY, "", this.model.getID());
 					this.model.client.sendMessage(ge);
 					this.model.setStartingPlayer();
 
 				} else {
-					this.view.setStatus("Can't connect to server");
+					Platform.runLater(new Runnable() {
+					    @Override public void run() {
+					    	view.setStatus("Can't connect to server");
+					    }
+					});
 				}
 
 			} else {
 				GameEvent ge = new GameEvent(GameEvent.C_QUIT_GAME);
 				this.model.client.sendMessage(ge);
 				this.model.client.stop();
-				this.view.connect.setText("Connect");
-				this.view.startServer.setDisable(false);
-				this.view.setStatus("Disconnected from server");
+				Platform.runLater(new Runnable() {
+				    @Override public void run() {
+				    	view.connect.setText("Connect");
+						view.startServer.setDisable(false);
+						view.setStatus("Disconnected from server");
+				    }
+				});
+				
 			}
 			// Handling Send button:
 		} else if (this.view.send.equals(eventSource)) {
@@ -99,10 +123,18 @@ public class GameController implements EventHandler {
 				try {
 					this.model.client.sendMessage(ge);
 				} catch (Exception e) {
-					this.view.setStatus("Message not sent");
+					Platform.runLater(new Runnable() {
+					    @Override public void run() {
+					    	view.setStatus("Message not sent");
+					    }
+					});
 				}
-				this.view.clearChatField();
-				this.view.setStatus("Message sent");
+				Platform.runLater(new Runnable() {
+				    @Override public void run() {
+				    	view.clearChatField();
+						view.setStatus("Message sent");
+				    }
+				});
 			}
 		}
 		repaintBoard(0);
@@ -120,18 +152,38 @@ public class GameController implements EventHandler {
 					GameEvent ge = new GameEvent(GameEvent.C_SHOT, y + "|" + x, this.model.getID());
 					if (this.model.client.isAlive()) {
 						this.model.client.sendMessage(ge);
-						this.view.setStatus("Shot sent");
+						Platform.runLater(new Runnable() {
+						    @Override public void run() {
+						    	view.setStatus("Shot sent");
+						    }
+						});
 					} else {
-						this.view.setStatus("Client inactive");
+						Platform.runLater(new Runnable() {
+						    @Override public void run() {
+						    	view.setStatus("Client inactive");
+						    }
+						});
 					}
 				}else{
-					this.view.setStatus("You already checked this field");
+					Platform.runLater(new Runnable() {
+					    @Override public void run() {
+					    	view.setStatus("You already checked this field");
+					    }
+					});
 				}
 			} else {
-				this.view.setStatus("Not your turn");
+				Platform.runLater(new Runnable() {
+				    @Override public void run() {
+				    	view.setStatus("Not your turn");
+				    }
+				});
 			}
 		} else {
-			this.view.setStatus("Game not started");
+			Platform.runLater(new Runnable() {
+			    @Override public void run() {
+			    	view.setStatus("Game not started");
+			    }
+			});
 		}
 		repaintBoard(0);
 		repaintBoard(1);

@@ -186,7 +186,7 @@ public class BattleshipsGame extends Application {
 						mainGame.view.setStatus("Broken connection");
 					}
 					try {
-						Thread.sleep(100);
+						Thread.sleep(1000);
 					} catch (InterruptedException ex) {
 					}
 				}
