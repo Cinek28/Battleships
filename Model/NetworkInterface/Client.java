@@ -27,6 +27,7 @@ public class Client {
 		}
 
 		connection = new Connection(socket);
+		connection.setNick(this.playerID);
 		connection.start();
 
 		return true;

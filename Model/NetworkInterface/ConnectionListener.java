@@ -10,7 +10,7 @@ public class ConnectionListener extends Thread {
 
 	private boolean canJoinToGame = false;
 
-	private int clientsCount = 0;
+	public int clientsCount = 0;
 
 	private int joinedClientsCount = 0;
 
@@ -34,7 +34,7 @@ public class ConnectionListener extends Thread {
 		int count = 1;
 
 		for (Connection connection : server.getConnections()) {
-			if (connection.isAlive() && connection.isJoined()) {
+			if (connection.isAlive()) {
 				geOut.setMessage(Integer.toString(count));
 				sendMessage(connection, geOut);
 				count++;
@@ -74,69 +74,67 @@ public class ConnectionListener extends Thread {
 								sendBroadcastMessage(geOut);
 							}
 							break;
-						case GameEvent.C_LOGIN:
-							if (ge.getPlayerId() != "") {
-								if (clientsCount == USER_COUNT) {
-									GameEvent geOut;
-									geOut = new GameEvent(GameEvent.S_LOGIN_FAIL,
-											"W grze znajduje si� ju� dw�ch graczy!");
-									sendMessage(connection, geOut);
-									geOut = new GameEvent(GameEvent.S_TOO_MANY_CONNECTIONS);
-									sendMessage(connection, geOut);
-								} else if (isPlayerIDUnique(ge.getPlayerId())) {
-									connection.setNick(ge.getPlayerId());
-									GameEvent geOut;
-									geOut = new GameEvent(GameEvent.SB_LOGIN, ge.getPlayerId());
-									sendBroadcastMessage(geOut);
-									clientsCount++;
-									if (clientsCount == USER_COUNT) {
-										canJoinToGame(true);
-									}
-								} else {
-									GameEvent geOut;
-									geOut = new GameEvent(GameEvent.S_LOGIN_FAIL,
-											"U�ytkownik \"" + ge.getPlayerId() + "\" ju� istnieje");
-									sendMessage(connection, geOut);
-									geOut = new GameEvent(GameEvent.S_USER_EXIST);
-									sendMessage(connection, geOut);
-								}
-							}
-							break;
-						case GameEvent.C_JOIN_GAME:
-							if (connection.getNick() != "") {
-								if (clientsCount != USER_COUNT) {
-									GameEvent geOut;
-									geOut = new GameEvent(GameEvent.S_JOIN_GAME_FAIL);
-									sendMessage(connection, geOut);
-								} else {
-									connection.setJoined(true);
-									GameEvent geOut;
-									geOut = new GameEvent(GameEvent.S_JOIN_GAME_OK);
-									sendMessage(connection, geOut);
-									geOut = new GameEvent(GameEvent.SB_PLAYER_JOINED, ge.getPlayerId());
-									sendBroadcastMessage(geOut);
-
-									joinedClientsCount++;
-									if (joinedClientsCount == USER_COUNT) {
-										startGame();
-									}
-								}
-							}
-							break;
+//						case GameEvent.C_LOGIN:
+//							if (ge.getPlayerId() != "") {
+//								if (clientsCount == USER_COUNT) {
+//									GameEvent geOut;
+//									geOut = new GameEvent(GameEvent.S_LOGIN_FAIL,
+//											"2 players already in game!");
+//									sendMessage(connection, geOut);
+//									geOut = new GameEvent(GameEvent.S_TOO_MANY_CONNECTIONS);
+//									sendMessage(connection, geOut);
+//								} else if (isPlayerIDUnique(ge.getPlayerId())) {
+//									connection.setNick(ge.getPlayerId());
+//									GameEvent geOut;
+//									geOut = new GameEvent(GameEvent.SB_LOGIN, ge.getPlayerId());
+//									sendBroadcastMessage(geOut);
+//									clientsCount++;
+//									if (clientsCount == USER_COUNT) {
+//										canJoinToGame(true);
+//									}
+//								} else {
+//									GameEvent geOut;
+//									geOut = new GameEvent(GameEvent.S_LOGIN_FAIL,
+//											"User \"" + ge.getPlayerId() + "\" already exist");
+//									sendMessage(connection, geOut);
+//									geOut = new GameEvent(GameEvent.S_USER_EXIST);
+//									sendMessage(connection, geOut);
+//								}
+//							}
+//							break;
+//						case GameEvent.C_JOIN_GAME:
+//							if (connection.getNick() != "") {
+//								if (clientsCount != USER_COUNT) {
+//									GameEvent geOut;
+//									geOut = new GameEvent(GameEvent.S_JOIN_GAME_FAIL);
+//									sendMessage(connection, geOut);
+//								} else {
+//									connection.setJoined(true);
+//									GameEvent geOut;
+//									geOut = new GameEvent(GameEvent.S_JOIN_GAME_OK);
+//									sendMessage(connection, geOut);
+//									geOut = new GameEvent(GameEvent.SB_PLAYER_JOINED, ge.getPlayerId());
+//									sendBroadcastMessage(geOut);
+//
+//									joinedClientsCount++;
+//									if (joinedClientsCount == USER_COUNT) {
+//										startGame();
+//									}
+//								}
+//							}
+//							break;
 						case GameEvent.C_READY:
-							if (connection.getNick() != "") {
 								readyClientsCount++;
 								if (readyClientsCount == USER_COUNT) {
 									GameEvent geOut;
 									geOut = new GameEvent(GameEvent.SB_ALL_READY);
 									sendBroadcastMessage(geOut);
 								}
-							}
 							break;
 						case GameEvent.C_SHOT:
 							if (ge.getPlayerId() != "") {
 								GameEvent geOut;
-								geOut = new GameEvent(GameEvent.SB_SHOT, ge.getMessage());
+								geOut = new GameEvent(GameEvent.SB_SHOT, ge.getMessage(),ge.getPlayerId());
 								geOut.setPlayerId(ge.getPlayerId());
 								sendBroadcastMessage(geOut);
 							}
@@ -144,14 +142,16 @@ public class ConnectionListener extends Thread {
 						case GameEvent.C_SHOT_RESULT:
 							if (ge.getPlayerId() != "") {
 								GameEvent geOut;
-								geOut = new GameEvent(GameEvent.SB_SHOT_RESULT, ge.getMessage());
+								geOut = new GameEvent(GameEvent.SB_SHOT_RESULT, ge.getMessage(), ge.getPlayerId());
 								geOut.setPlayerId(ge.getPlayerId());
+								System.out.println(geOut.getPlayerId()+"bbbb");
 								sendBroadcastMessage(geOut);
 							}
 							break;
 
 						case GameEvent.C_QUIT_GAME:
 							joinedClientsCount = 0;
+							
 							break;
 						}
 					}

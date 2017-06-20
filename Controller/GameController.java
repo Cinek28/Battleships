@@ -31,21 +31,20 @@ public class GameController implements EventHandler {
 					this.view.setStatus("Setting up server on port: " + serverPort);
 					this.model.server.setPort(Integer.parseInt(serverPort));
 					this.model.client = new Client("Server", "127.0.0.1", Integer.parseInt(serverPort));
-					System.out.println(this.model.getID());
 				} else {
 					this.view.setStatus("Setting up server on default port: 8081");
 					this.model.server.setPort(8081);
 					this.model.client = new Client("Server", "127.0.0.1", 8081);
-					System.out.println(this.model.getID());
 				}
 				if (this.model.server.start()) {
 					if (this.model.client.start()) {
+						GameEvent ge = new GameEvent(GameEvent.C_READY, "", this.model.getID());
+						this.model.client.sendMessage(ge);
 						this.view.connect.setDisable(true);
 						this.view.startServer.setText("Disconnect");
-						System.out.println("Ok");
+						System.out.println(ge.getPlayerId());
 					} else {
 						this.view.setStatus("Problem starting client, disconnecting server");
-						System.out.println("Server client disconnected");
 						this.model.server.stop();
 					}
 				} else {
@@ -54,6 +53,9 @@ public class GameController implements EventHandler {
 				}
 				// Stopping running server if running:
 			} else {
+				GameEvent ge = new GameEvent(GameEvent.C_QUIT_GAME);
+				this.model.client.sendMessage(ge);
+				this.model.client.stop();
 				this.model.server.stop();
 				this.view.connect.setDisable(false);
 				this.view.startServer.setText("Start server");
@@ -78,15 +80,18 @@ public class GameController implements EventHandler {
 					this.view.connect.setText("Disconnect");
 					this.view.startServer.setDisable(true);
 					this.view.setStatus("Connected to server");
-					this.model.setGameStatus(GameStatus.STARTED);
+					GameEvent ge = new GameEvent(GameEvent.C_READY, "", this.model.getID());
+					System.out.println(ge.getPlayerId());
+					this.model.client.sendMessage(ge);
 					this.model.setStartingPlayer();
+
 				} else {
 					this.view.setStatus("Can't connect to server");
-					System.out.println("Can't connect to server");
 				}
 
 			} else {
-				System.out.println("Disconnected from server");
+				GameEvent ge = new GameEvent(GameEvent.C_QUIT_GAME);
+				this.model.client.sendMessage(ge);
 				this.model.client.stop();
 				this.view.connect.setText("Connect");
 				this.view.startServer.setDisable(false);
@@ -112,17 +117,21 @@ public class GameController implements EventHandler {
 
 	public void handleMouseEvent(MouseEvent event) {
 		// Handling mouse click on enemy board:
-		System.out.println("XXX");
 		int x = ((int) event.getX()) / 30;
 		int y = ((int) event.getY()) / 30;
 		if (this.model.getGameStatus() == GameStatus.STARTED) {
 			if (this.model.getWhoseTurn() == ActualPlayer.PLAYER) {
-				GameEvent ge = new GameEvent(GameEvent.C_SHOT, x + "|" + y, this.model.getID());
-				if (this.model.client.isAlive()) {
-					this.model.client.sendMessage(ge);
-					this.view.setStatus("Shot sent");
-				} else {
-					this.view.setStatus("Client inactive");
+				Status check = this.model.gameBoard.getEnemyStatus(y, x);
+				if (check == Status.UNKNOWN) {
+					GameEvent ge = new GameEvent(GameEvent.C_SHOT, y + "|" + x, this.model.getID());
+					if (this.model.client.isAlive()) {
+						this.model.client.sendMessage(ge);
+						this.view.setStatus("Shot sent");
+					} else {
+						this.view.setStatus("Client inactive");
+					}
+				}else{
+					this.view.setStatus("You already checked this field");
 				}
 			} else {
 				this.view.setStatus("Not your turn");
@@ -130,16 +139,16 @@ public class GameController implements EventHandler {
 		} else {
 			this.view.setStatus("Game not started");
 		}
+		repaintBoard(0);
+		repaintBoard(1);
 	}
 
 	public void initGame() {
-		System.out.println("INIT");
 		this.model.gameBoard.clearEnemyBoard();
 		this.model.gameBoard.clearBoard();
 		this.model.gameBoard.setBoardRandom();
 		this.model.resetNumberOfShips();
 		this.model.setGameStatus(GameStatus.INIT);
-		this.view.setBoards();
 		repaintBoard(0);
 		repaintBoard(1);
 	}
@@ -157,12 +166,14 @@ public class GameController implements EventHandler {
 					this.view.setBoardColor(Color.YELLOW, row, col, whichBoard);
 				else if (checkStatus == Status.ISSHIP)
 					this.view.setBoardColor(Color.RED, row, col, whichBoard);
-				else if (checkStatus == Status.ISNOTSHIP) {
+				else if (checkStatus == Status.ISNOTSHIP) 
 					this.view.setBoardColor(Color.BLUE, row, col, whichBoard);
-				} else if (checkStatus == Status.SHIPDESTROYED)
+				else if (checkStatus == Status.SHIPDESTROYED)
 					this.view.setBoardColor(Color.BLACK, row, col, whichBoard);
 				else if (checkStatus == Status.UNKNOWN)
 					this.view.setBoardColor(Color.GRAY, row, col, whichBoard);
+				else if (checkStatus == Status.SHOT)
+					this.view.setBoardColor(Color.DARKGREEN, row, col, whichBoard);
 			}
 		}
 	}

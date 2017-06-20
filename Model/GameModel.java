@@ -39,7 +39,7 @@ public class GameModel {
 	}
 
 	public void resetNumberOfShips() {
-		gameBoard.setNoOfShipsActive(8);
+		gameBoard.setNoOfShipsActive(7);
 	}
 
 }
