@@ -13,25 +13,135 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import sun.rmi.runtime.NewThreadAction;
 
-public class GameController implements EventHandler<Event> {
-	public static GameModel model;
-	public static GameWindow view;
+public class GameController implements EventHandler {
+	public final GameModel model = new GameModel();
+	public final GameWindow view = new GameWindow(this);
 
-	public GameController(GameWindow view) {
-		GameController.view = view;
+	@Override
+	public void handle(Event event) {
+		// Server start button:
+		Object eventSource = event.getSource();
+		if (this.view.startServer.equals(eventSource)) {
+			// Starting server if not running:
+			String serverPort = this.view.getServerPort();
+			if (!this.model.server.isRunning()) {
+				if (!serverPort.equals("")) {
+					this.view.setStatus("Setting up server on port: " + serverPort);
+					this.model.server.setPort(Integer.parseInt(serverPort));
+					this.model.client = new Client("Server", "127.0.0.1", Integer.parseInt(serverPort));
+					System.out.println(this.model.getID());
+				} else {
+					this.view.setStatus("Setting up server on default port: 8081");
+					this.model.server.setPort(8081);
+					this.model.client = new Client("Server", "127.0.0.1", 8081);
+					System.out.println(this.model.getID());
+				}
+				if (this.model.server.start()) {
+					if (this.model.client.start()) {
+						this.view.connect.setDisable(true);
+						this.view.startServer.setText("Disconnect");
+						System.out.println("Ok");
+					} else {
+						this.view.setStatus("Problem starting client, disconnecting server");
+						System.out.println("Server client disconnected");
+						this.model.server.stop();
+					}
+				} else {
+					this.view.setStatus("Can't start server port " + serverPort);
+
+				}
+				// Stopping running server if running:
+			} else {
+				this.model.server.stop();
+				this.view.connect.setDisable(false);
+				this.view.startServer.setText("Start server");
+				this.view.setStatus("Server disconnected");
+			}
+
+			// Connect button:
+		} else if (this.view.connect.equals(eventSource)) {
+			String hostIP = this.view.getHostIp();
+			String hostPort = this.view.getHostPort();
+			if (!(this.model.client.isAlive())) {
+				if (!(hostIP.equals("") && hostPort.equals(""))) {
+					this.view.setStatus("Connecting to: " + hostIP + " on port " + hostPort);
+					this.model.client = new Client("Client", hostIP, Integer.parseInt(hostPort));
+					this.model.server = new Server(Integer.parseInt(hostPort));
+				} else {
+					this.view.setStatus("Connecting to local server: 127.0.0.1. on port 8081");
+					this.model.client = new Client("Client", hostIP, 8081);
+					this.model.server = new Server(8081);
+				}
+				if (this.model.client.start()) {
+					this.view.connect.setText("Disconnect");
+					this.view.startServer.setDisable(true);
+					this.view.setStatus("Connected to server");
+					this.model.setGameStatus(GameStatus.STARTED);
+					this.model.setStartingPlayer();
+				} else {
+					this.view.setStatus("Can't connect to server");
+					System.out.println("Can't connect to server");
+				}
+
+			} else {
+				System.out.println("Disconnected from server");
+				this.model.client.stop();
+				this.view.connect.setText("Connect");
+				this.view.startServer.setDisable(false);
+				this.view.setStatus("Disconnected from server");
+			}
+			// Handling Send button:
+		} else if (this.view.send.equals(eventSource)) {
+			String message = this.view.getChatMsg();
+			if (!message.equals("") && this.model.client.isAlive()) {
+				GameEvent ge = new GameEvent(GameEvent.C_CHAT_MSG, message, model.client.getPlayerID());
+				try {
+					this.model.client.sendMessage(ge);
+				} catch (Exception e) {
+					this.view.setStatus("Message not sent");
+				}
+				this.view.clearChatField();
+				this.view.setStatus("Message sent");
+			}
+		}
+		repaintBoard(0);
+		repaintBoard(1);
 	}
 
-	public void initGame(GameModel model) {
-		GameController.model = model;
-		GameController.model.gameBoard.clearEnemyBoard();
-		GameController.model.gameBoard.clearBoard();
-		GameController.model.gameBoard.setBoardRandom();
-		GameController.model.resetNumberOfShips();
-		GameController.model.setGameStatus(GameStatus.INIT);
-		// repaintBoard(0);
-		// repaintBoard(1);
+	public void handleMouseEvent(MouseEvent event) {
+		// Handling mouse click on enemy board:
+		System.out.println("XXX");
+		int x = ((int) event.getX()) / 30;
+		int y = ((int) event.getY()) / 30;
+		if (this.model.getGameStatus() == GameStatus.STARTED) {
+			if (this.model.getWhoseTurn() == ActualPlayer.PLAYER) {
+				GameEvent ge = new GameEvent(GameEvent.C_SHOT, x + "|" + y, this.model.getID());
+				if (this.model.client.isAlive()) {
+					this.model.client.sendMessage(ge);
+					this.view.setStatus("Shot sent");
+				} else {
+					this.view.setStatus("Client inactive");
+				}
+			} else {
+				this.view.setStatus("Not your turn");
+			}
+		} else {
+			this.view.setStatus("Game not started");
+		}
+	}
 
+	public void initGame() {
+		System.out.println("INIT");
+		this.model.gameBoard.clearEnemyBoard();
+		this.model.gameBoard.clearBoard();
+		this.model.gameBoard.setBoardRandom();
+		this.model.resetNumberOfShips();
+		this.model.setGameStatus(GameStatus.INIT);
+		this.view.setBoards();
+		repaintBoard(0);
+		repaintBoard(1);
 	}
 
 	public void repaintBoard(int whichBoard) {
@@ -39,142 +149,26 @@ public class GameController implements EventHandler<Event> {
 		for (int row = 0; row < 10; ++row) {
 			for (int col = 0; col < 10; ++col) {
 				if (whichBoard == 0) {
-					checkStatus = GameController.model.gameBoard.getStatus(row, col);
+					checkStatus = this.model.gameBoard.getStatus(row, col);
 				} else {
-					checkStatus = GameController.model.gameBoard.getEnemyStatus(row, col);
+					checkStatus = this.model.gameBoard.getEnemyStatus(row, col);
 				}
 				if (checkStatus == Status.MISSED)
-					GameController.view.setBoardColor(Color.YELLOW, row, col, whichBoard);
+					this.view.setBoardColor(Color.YELLOW, row, col, whichBoard);
 				else if (checkStatus == Status.ISSHIP)
-					GameController.view.setBoardColor(Color.RED, row, col, whichBoard);
+					this.view.setBoardColor(Color.RED, row, col, whichBoard);
 				else if (checkStatus == Status.ISNOTSHIP) {
-					GameController.view.setBoardColor(Color.BLUE, row, col, whichBoard);
+					this.view.setBoardColor(Color.BLUE, row, col, whichBoard);
 				} else if (checkStatus == Status.SHIPDESTROYED)
-					GameController.view.setBoardColor(Color.BLACK, row, col, whichBoard);
+					this.view.setBoardColor(Color.BLACK, row, col, whichBoard);
 				else if (checkStatus == Status.UNKNOWN)
-					GameController.view.setBoardColor(Color.GRAY, row, col, whichBoard);
+					this.view.setBoardColor(Color.GRAY, row, col, whichBoard);
 			}
 		}
 	}
 
 	public void addToChat(String message) {
-		GameController.view.addToChat(message);
+		this.view.addToChat(message);
 	}
 
-	public void handleActionEvent(ActionEvent event) {
-		// handle buttons events event:
-
-		// Server start button:
-		Object eventSource = event.getSource();
-		if (GameController.view.startServer.equals(eventSource)) {
-			// Starting server if not running:
-			String serverPort = GameController.view.getServerPort();
-			if (!GameController.model.server.isRunning()) {
-				if (!serverPort.equals("")) {
-					GameController.view.setStatus("Setting up server on port: " + serverPort);
-					GameController.model.server.setPort(Integer.parseInt(serverPort));
-					GameController.model.client = new Client("Server", "127.0.0.1", Integer.parseInt(serverPort));
-					System.out.println(GameController.model.getID());
-				} else {
-					GameController.view.setStatus("Setting up server on default port: 8081");
-					GameController.model.server.setPort(8081);
-					GameController.model.client = new Client("Server", "127.0.0.1", 8081);
-					System.out.println(GameController.model.getID());
-				}
-				if (GameController.model.server.start()) {
-					if (GameController.model.client.start()) {
-						GameController.view.connect.setDisable(true);
-						GameController.view.startServer.setText("Disconnect");
-						System.out.println("Ok");
-					} else {
-						GameController.view.setStatus("Problem starting client, disconnecting server");
-						System.out.println("Server client disconnected");
-						GameController.model.server.stop();
-					}
-				} else {
-					GameController.view.setStatus("Can't start server port " + serverPort);
-
-				}
-				// Stopping running server if running:
-			} else {
-				GameController.model.server.stop();
-				GameController.view.connect.setDisable(false);
-				GameController.view.startServer.setText("Start server");
-				GameController.view.setStatus("Server disconnected");
-			}
-
-			// Connect button:
-		} else if (GameController.view.connect.equals(eventSource)) {
-			String hostIP = GameController.view.getHostIp();
-			String hostPort = GameController.view.getHostPort();
-			if (!(GameController.model.client.isAlive())) {
-				if (!(hostIP.equals("") && hostPort.equals(""))) {
-					GameController.view.setStatus("Connecting to: " + hostIP + " on port " + hostPort);
-					GameController.model.client = new Client("Client", hostIP, Integer.parseInt(hostPort));
-					GameController.model.server = new Server(Integer.parseInt(hostPort));
-				} else {
-					GameController.view.setStatus("Connecting to local server: 127.0.0.1. on port 8081");
-					GameController.model.client = new Client("Client", hostIP, 8081);
-					GameController.model.server = new Server(8081);
-				}
-				if (GameController.model.client.start()) {
-					GameController.view.connect.setText("Disconnect");
-					GameController.view.startServer.setDisable(true);
-					GameController.view.setStatus("Connected to server");
-					GameController.model.setGameStatus(GameStatus.STARTED);
-					GameController.model.setStartingPlayer();
-				} else {
-					GameController.view.setStatus("Can't connect to server");
-					System.out.println("Can't connect to server");
-				}
-
-			} else {
-				System.out.println("Disconnected from server");
-				GameController.model.client.stop();
-				GameController.view.connect.setText("Connect");
-				GameController.view.startServer.setDisable(false);
-				GameController.view.setStatus("Disconnected from server");
-			}
-			// Handling Send button:
-		} else if (GameController.view.send.equals(eventSource)) {
-			String message = GameController.view.getChatMsg();
-			if (!message.equals("") && GameController.model.client.isAlive()) {
-				GameEvent ge = new GameEvent(GameEvent.C_CHAT_MSG, message, GameController.model.client.getPlayerID());
-				try {
-					GameController.model.client.sendMessage(ge);
-				} catch (Exception e) {
-					GameController.view.setStatus("Message not sent");
-				}
-				GameController.view.clearChatField();
-				GameController.view.setStatus("Message sent");
-			}
-		}
-	}
-
-	public void handleMouseEvent(MouseEvent event) {
-		int x = ((int) event.getX()) / 30;
-		int y = ((int) event.getY()) / 30;
-		System.out.println(x + " " + y);
-		if (GameController.model.client.isAlive() && GameController.model.getGameStatus() == GameStatus.STARTED) {
-			if (GameController.model.getWhoseTurn() == ActualPlayer.PLAYER) {
-				GameEvent ge = new GameEvent(GameEvent.C_SHOT);
-				ge.setMessage(x + "|" + y);
-				try {
-					GameController.model.client.sendMessage(ge);
-				} catch (Exception e) {
-					GameController.view.setStatus("Shot not sent");
-				}
-				GameController.model.changeTurn();
-			} else {
-				GameController.view.setStatus("Not your turn");
-			}
-		}
-		repaintBoard(0);
-		repaintBoard(1);
-	}
-
-	@Override
-	public void handle(Event event) {
-
-	}
 }

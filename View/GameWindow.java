@@ -34,7 +34,7 @@ import javafx.scene.layout.TilePane;
 
 import Controller.*;
 
-public class GameWindow extends Application {
+public class GameWindow extends GridPane {
 	private Label hostIpLabel = new Label("Host IP:");
 	private Label hostPortLabel = new Label("Host port:");
 	private Label serverPortLabel = new Label("Server port:");
@@ -53,14 +53,27 @@ public class GameWindow extends Application {
 	private Rectangle myBoard[][] = new Rectangle[10][10];
 	private Group myBoardGroup = new Group();
 	private Group enemyBoardGroup = new Group();
+	
+	//Controller:
+	private GameController controller;
 
 	/** Initializing window: */
 	
-	public GameWindow(){
-		setBoards();
+	public GameWindow(GameController controller){
+		this.controller = controller;
 	}
 	
-	private void setBoards() {
+	public void addButtonsListener(){
+		connect.setOnAction(controller::handle);
+		send.setOnAction(controller::handle);
+		startServer.setOnAction(controller::handle);
+	}
+	
+	public void addMouseListener(){
+		enemyBoardGroup.setOnMouseClicked(controller::handleMouseEvent);
+	}
+	
+	public void setBoards() {
 		int width = 30;
 		int height = 30;
 		for (int row = 0; row < 10; ++row) {
@@ -83,8 +96,9 @@ public class GameWindow extends Application {
 
 	}
 
-	private Parent setParent() {
+	public Parent setParent() {
 		// Buttons initialization:
+		setBoards();
 		startServer.setPrefSize(150, 10);
 		send.setPrefSize(150, 10);
 		connect.setPrefSize(150, 10);
@@ -92,14 +106,9 @@ public class GameWindow extends Application {
 		send.setAlignment(Pos.CENTER);
 		connect.setAlignment(Pos.CENTER);
 		
-		//Buttons setting handlers for actions:
+		addButtonsListener();
+		addMouseListener();
 		
-		startServer.setOnAction(new GameController(this)::handleActionEvent);
-
-		connect.setOnAction(new GameController(this)::handleActionEvent);
-
-		send.setOnAction(new GameController(this)::handleActionEvent);
-
 		// TextField initialization:
 		chatField.setPrefSize(150, 10);
 		hostIpField.setPrefSize(150, 10);
@@ -121,7 +130,6 @@ public class GameWindow extends Application {
 		hostPortLabel.setTextFill(Color.RED);
 		serverPortLabel.setTextFill(Color.RED);
 		yourBoard.setTextFill(Color.YELLOW);
-
 		TilePane hostConnect = new TilePane(Orientation.HORIZONTAL);
 		hostConnect.setAlignment(Pos.CENTER_RIGHT);
 		hostConnect.setHgap(1.0);
@@ -164,9 +172,6 @@ public class GameWindow extends Application {
 		GridPane.setConstraints(chat, 1, 1, 1, 1, HPos.RIGHT, VPos.CENTER);
 		root.getChildren().addAll(configs, chat);
 		
-		//Adding mouse event handler to board group:
-		enemyBoardGroup.setOnMouseClicked(new GameController(this)::handleMouseEvent);
-		
 		GridPane.setConstraints(myBoardGroup, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
 		GridPane.setConstraints(yourBoard, 0, 0, 1, 1, HPos.CENTER, VPos.BOTTOM);
 		root.getChildren().addAll(myBoardGroup, yourBoard);
@@ -179,39 +184,6 @@ public class GameWindow extends Application {
 		root.setMinSize(800, 600);
 		root.setBackground(new Background(image));
 		return root;
-	}
-	
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		// Setting the title to Stage.
-		primaryStage.setTitle("Battleships");
-
-		Scene scene = new Scene(setParent());
-
-		// Adding the scene to Stage
-		primaryStage.setScene(scene);
-		primaryStage.setResizable(false);
-		
-		//Adding icon to stage:
-		primaryStage.getIcons().add(new Image("/View/battleship.jpg"));
-		
-		// Displaying the contents of the stage
-		primaryStage.show();
-		
-		//Handling exit:
-	    primaryStage.setOnCloseRequest(new EventHandler<javafx.stage.WindowEvent>(){
-			@Override
-			public void handle(javafx.stage.WindowEvent event) {
-				Platform.exit();
-		        System.exit(0);
-			}
-	    });
-
-	}
-	
-	@Override
-	public void stop(){
-		
 	}
 
 	public void setBoardColor(Color color, int row, int column, int whichBoard) {
@@ -246,10 +218,6 @@ public class GameWindow extends Application {
 	}
 	public void clearChatField(){
 		chatField.clear();
-	}
-
-	public static void main(String args[]) {
-		launch(args);
 	}
 	
 }
