@@ -25,7 +25,6 @@ public class Client {
 		} catch (Exception ex) {
 			return false;
 		}
-
 		connection = new Connection(socket);
 		connection.setNick(this.playerID);
 		connection.start();

@@ -60,10 +60,12 @@ public class GameController implements EventHandler {
 
 			// Connect button:
 		} else if (this.view.connect.equals(eventSource)) {
+			
+			
 			String hostIP = this.view.getHostIp();
 			String hostPort = this.view.getHostPort();
 			if (!(this.model.client.isAlive())) {
-				if (!(hostIP.equals("") && hostPort.equals(""))) {
+				if (!(hostIP.equals("") || hostPort.equals(""))) {
 					Platform.runLater(new Runnable() {
 					    @Override public void run() {
 					    	view.setStatus("Connecting to: " + hostIP + " on port " + hostPort);
@@ -71,6 +73,7 @@ public class GameController implements EventHandler {
 					});
 					this.model.client = new Client("Client", hostIP, Integer.parseInt(hostPort));
 					this.model.server = new Server(Integer.parseInt(hostPort));
+					
 				} else {
 					Platform.runLater(new Runnable() {
 					    @Override public void run() {
@@ -89,7 +92,6 @@ public class GameController implements EventHandler {
 							view.setStatus("Connected to server");
 					    }
 					});
-					
 					GameEvent ge = new GameEvent(GameEvent.C_READY, "", this.model.getID());
 					this.model.client.sendMessage(ge);
 					this.model.setStartingPlayer();
