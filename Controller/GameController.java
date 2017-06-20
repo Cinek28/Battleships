@@ -5,16 +5,12 @@ import Model.NetworkInterface.Client;
 import Model.NetworkInterface.GameEvent;
 import Model.NetworkInterface.Server;
 import View.*;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-import sun.rmi.runtime.NewThreadAction;
 
+@SuppressWarnings("rawtypes")
 public class GameController implements EventHandler {
 	public final GameModel model = new GameModel();
 	public final GameWindow view = new GameWindow(this);
