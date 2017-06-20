@@ -38,7 +38,6 @@ public class GameController implements EventHandler {
 						this.model.client.sendMessage(ge);
 						this.view.connect.setDisable(true);
 						this.view.startServer.setText("Disconnect");
-						System.out.println(ge.getPlayerId());
 					} else {
 						this.view.setStatus("Problem starting client, disconnecting server");
 						this.model.server.stop();
@@ -77,7 +76,6 @@ public class GameController implements EventHandler {
 					this.view.startServer.setDisable(true);
 					this.view.setStatus("Connected to server");
 					GameEvent ge = new GameEvent(GameEvent.C_READY, "", this.model.getID());
-					System.out.println(ge.getPlayerId());
 					this.model.client.sendMessage(ge);
 					this.model.setStartingPlayer();
 

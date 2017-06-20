@@ -11,36 +11,36 @@ public class ConnectionListener extends Thread {
 	private boolean canJoinToGame = false;
 
 	public int clientsCount = 0;
-
+//Not used
 	private int joinedClientsCount = 0;
 
 	private int readyClientsCount = 0;
-
-	private void canJoinToGame(boolean b) {
-		canJoinToGame = b;
-		GameEvent geOut;
-		if (canJoinToGame) {
-			geOut = new GameEvent(GameEvent.SB_CAN_JOIN_GAME);
-		} else {
-			geOut = new GameEvent(GameEvent.SB_CANNOT_JOIN_GAME);
-		}
-		sendBroadcastMessage(geOut);
-	}
-
-	private void startGame() {
-		readyClientsCount = 0;
-		GameEvent geOut;
-		geOut = new GameEvent(GameEvent.SB_START_GAME);
-		int count = 1;
-
-		for (Connection connection : server.getConnections()) {
-			if (connection.isAlive()) {
-				geOut.setMessage(Integer.toString(count));
-				sendMessage(connection, geOut);
-				count++;
-			}
-		}
-	}
+//Not used
+//	private void canJoinToGame(boolean b) {
+//		canJoinToGame = b;
+//		GameEvent geOut;
+//		if (canJoinToGame) {
+//			geOut = new GameEvent(GameEvent.SB_CAN_JOIN_GAME);
+//		} else {
+//			geOut = new GameEvent(GameEvent.SB_CANNOT_JOIN_GAME);
+//		}
+//		sendBroadcastMessage(geOut);
+//	}
+//Not used
+//	private void startGame() {
+//		readyClientsCount = 0;
+//		GameEvent geOut;
+//		geOut = new GameEvent(GameEvent.SB_START_GAME);
+//		int count = 1;
+//
+//		for (Connection connection : server.getConnections()) {
+//			if (connection.isAlive()) {
+//				geOut.setMessage(Integer.toString(count));
+//				sendMessage(connection, geOut);
+//				count++;
+//			}
+//		}
+//	}
 
 	public ConnectionListener(Server server) {
 		this.server = server;
@@ -144,7 +144,6 @@ public class ConnectionListener extends Thread {
 								GameEvent geOut;
 								geOut = new GameEvent(GameEvent.SB_SHOT_RESULT, ge.getMessage(), ge.getPlayerId());
 								geOut.setPlayerId(ge.getPlayerId());
-								System.out.println(geOut.getPlayerId()+"bbbb");
 								sendBroadcastMessage(geOut);
 							}
 							break;

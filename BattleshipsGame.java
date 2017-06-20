@@ -85,7 +85,6 @@ public class BattleshipsGame extends Application {
 									int idx1 = s.indexOf('|');
 									String a = s.substring(0, idx1);
 									String b = s.substring(idx1 + 1);
-									System.out.println(a + " " + b);
 									try {
 										int x = Integer.parseInt(a);
 										int y = Integer.parseInt(b);
@@ -102,7 +101,6 @@ public class BattleshipsGame extends Application {
 								break;
 
 							case GameEvent.SB_SHOT_RESULT: {
-								System.out.println("SHOT_RESULT:" + ge.getPlayerId());
 								String s = ge.getMessage();
 								int idx1 = s.indexOf('|');
 								int idx2 = s.indexOf('|', idx1 + 1);
