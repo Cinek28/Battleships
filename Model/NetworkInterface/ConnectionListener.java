@@ -50,7 +50,6 @@ public class ConnectionListener extends Thread {
 		while (server.isRunning()) {
 			for (int i = server.getConnections().size() - 1; i >= 0; --i) {
 				Connection connection = (Connection) server.getConnections().get(i);
-
 				if (!connection.isAlive()) {
 					if (connection.getNick() != "") {
 						GameEvent geOut;
@@ -127,6 +126,7 @@ public class ConnectionListener extends Thread {
 								readyClientsCount++;
 								if (readyClientsCount == USER_COUNT) {
 									GameEvent geOut;
+									connection.setNick(ge.getPlayerId());
 									geOut = new GameEvent(GameEvent.SB_ALL_READY);
 									sendBroadcastMessage(geOut);
 								}

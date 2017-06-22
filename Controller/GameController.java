@@ -39,6 +39,7 @@ public class GameController implements EventHandler {
 						this.model.client.sendMessage(ge);
 						this.view.connect.setDisable(true);
 						this.view.startServer.setText("Disconnect");
+						this.model.setStartingPlayer(ActualPlayer.ENEMY);
 					} else {
 						this.view.setStatus("Problem starting client, disconnecting server");
 						this.model.server.stop();
@@ -60,8 +61,6 @@ public class GameController implements EventHandler {
 
 			// Connect button:
 		} else if (this.view.connect.equals(eventSource)) {
-			
-			
 			String hostIP = this.view.getHostIp();
 			String hostPort = this.view.getHostPort();
 			if (!(this.model.client.isAlive())) {
@@ -94,7 +93,7 @@ public class GameController implements EventHandler {
 					});
 					GameEvent ge = new GameEvent(GameEvent.C_READY, "", this.model.getID());
 					this.model.client.sendMessage(ge);
-					this.model.setStartingPlayer();
+					this.model.setStartingPlayer(ActualPlayer.PLAYER);
 
 				} else {
 					Platform.runLater(new Runnable() {

@@ -30,8 +30,8 @@ public class GameModel {
 		}
 	}
 
-	public void setStartingPlayer() {
-		WhoseTurn = ActualPlayer.PLAYER;
+	public void setStartingPlayer(ActualPlayer player) {
+		WhoseTurn = player;
 	}
 
 	public String getID() {

@@ -62,18 +62,31 @@ public class BattleshipsGame extends Application {
 								mainGame.addToChat(ge.getMessage() + "\n");
 								break;
 
-//							case GameEvent.SB_LOGIN:
-//								if (mainGame.model.getID().compareTo(ge.getMessage()) != 0) {
-//									mainGame.view.setStatus("Player " + ge.getPlayerId() + "joined");
-//								}
-//								break;
+							// case GameEvent.SB_LOGIN:
+							// if
+							// (mainGame.model.getID().compareTo(ge.getMessage())
+							// != 0) {
+							// mainGame.view.setStatus("Player " +
+							// ge.getPlayerId() + "joined");
+							// }
+							// break;
 
 							case GameEvent.SB_ALL_READY:
 								if (mainGame.model.getWhoseTurn() == ActualPlayer.PLAYER) {
-									mainGame.view.setStatus("Game started. Your turn.");
+									Platform.runLater(new Runnable() {
+										@Override
+										public void run() {
+											mainGame.view.setStatus("Game started. Your turn.");
+										}
+									});
 									mainGame.model.setGameStatus(GameStatus.STARTED);
 								} else {
-									mainGame.view.setStatus("Game started. Enemy's turn.");
+									Platform.runLater(new Runnable() {
+										@Override
+										public void run() {
+											mainGame.view.setStatus("Game started. Enemy's turn.");
+										}
+									});
 									mainGame.model.setGameStatus(GameStatus.STARTED);
 								}
 								break;
@@ -89,12 +102,15 @@ public class BattleshipsGame extends Application {
 										int x = Integer.parseInt(a);
 										int y = Integer.parseInt(b);
 										ShotStatus w = mainGame.model.gameBoard.checkShot(x, y);
-										if(w != ShotStatus.CHECKED){
-										GameEvent geOut = new GameEvent(GameEvent.C_SHOT_RESULT, "", mainGame.model.getID());
-										geOut.setMessage(x + "|" + y + "|" + w.ordinal());
-										mainGame.model.client.sendMessage(geOut);
+										if (w != ShotStatus.CHECKED) {
+											GameEvent geOut = new GameEvent(GameEvent.C_SHOT_RESULT, "",
+													mainGame.model.getID());
+											geOut.setMessage(x + "|" + y + "|" + w.ordinal());
+											mainGame.model.client.sendMessage(geOut);
 										}
 									} catch (NumberFormatException ex) {
+										ex.printStackTrace();
+
 									}
 
 								}
@@ -120,33 +136,67 @@ public class BattleshipsGame extends Application {
 										mainGame.model.gameBoard.setShot(x, y, w, ActualPlayer.PLAYER);
 									}
 
-									if (w == ShotStatus.MISSED) {//MISSED
+									if (w == ShotStatus.MISSED) {// MISSED
 										if (mainGame.model.getID().compareTo(ge.getPlayerId()) != 0) {
-											mainGame.view.setStatus("You missed");
+											Platform.runLater(new Runnable() {
+												@Override
+												public void run() {
+													mainGame.view.setStatus("You missed");
+												}
+											});
 										} else {
-											mainGame.view.setStatus("Enemy missed");
+											Platform.runLater(new Runnable() {
+												@Override
+												public void run() {
+													mainGame.view.setStatus("Enemy missed");
+												}
+											});
 										}
 										mainGame.model.changeTurn();
-									} else {//SHOT
+									} else {// SHOT
 										if (w == ShotStatus.SHOT) {
 											if (mainGame.model.getID().compareTo(ge.getPlayerId()) != 0) {
-												mainGame.view.setStatus("You shot the ship, it is not destroyed");
+												Platform.runLater(new Runnable() {
+													@Override
+													public void run() {
+														mainGame.view
+																.setStatus("You shot the ship, it is not destroyed");
+													}
+												});
 											} else {
-												mainGame.view.setStatus("Enemy shot your ship, it is not destroyed");
+												Platform.runLater(new Runnable() {
+													@Override
+													public void run() {
+														mainGame.view
+																.setStatus("Enemy shot your ship, it is not destroyed");
+													}
+												});
 											}
 										} else { // SHOT_AND_DESTROYED
 											if (mainGame.model.getID().compareTo(ge.getPlayerId()) != 0) {
-												mainGame.view.setStatus("You destroyed enemy ship");
-												if(mainGame.model.gameBoard.getNoOfShipsActive() == 0){
-													mainGame.view.setStatus("You won");
-													mainGame.initGame();
-												}
+												Platform.runLater(new Runnable() {
+													@Override
+													public void run() {
+														mainGame.view.setStatus("You destroyed enemy ship");
+														if (mainGame.model.gameBoard.getNoOfShipsActive() == 0) {
+															mainGame.view.setStatus("You won");
+															mainGame.initGame();
+															mainGame.model.setGameStatus(GameStatus.STARTED);
+														}
+													}
+												});
 											} else {
-												mainGame.view.setStatus("Enemy destroyed your ship.");
-												if(mainGame.model.gameBoard.getNoOfShipsActive() == 0){
-													mainGame.view.setStatus("You lost");
-													mainGame.initGame();
-												}
+												Platform.runLater(new Runnable() {
+													@Override
+													public void run() {
+														mainGame.view.setStatus("Enemy destroyed your ship.");
+														if (mainGame.model.gameBoard.getNoOfShipsActive() == 0) {
+															mainGame.view.setStatus("You lost");
+															mainGame.initGame();
+															mainGame.model.setGameStatus(GameStatus.STARTED);
+														}
+													}
+												});
 											}
 										}
 									}
@@ -157,36 +207,71 @@ public class BattleshipsGame extends Application {
 							}
 								break;
 
-							 case GameEvent.SB_PLAYER_QUIT:
-							 mainGame.initGame();
-							 mainGame.repaintBoard(0);
-							 mainGame.repaintBoard(1);
-							 mainGame.model.client.stop();
-							 if(mainGame.model.server.isRunning()){
-								 mainGame.model.server.stop();
-								 mainGame.view.connect.setDisable(false);
-								 mainGame.view.startServer.setText("Start server");
-							 }else{
-								 mainGame.view.startServer.setDisable(false);
-								 mainGame.view.connect.setText("Connect");
-							 }
-							 break;
+							case GameEvent.SB_PLAYER_QUIT:
+								mainGame.initGame();
+								mainGame.repaintBoard(0);
+								mainGame.repaintBoard(1);
+								mainGame.model.client.stop();
+								if (mainGame.model.server.isRunning()) {
+									mainGame.model.server.stop();
+									Platform.runLater(new Runnable() {
+										@Override
+										public void run() {
+											mainGame.view.connect.setDisable(false);
+											mainGame.view.startServer.setText("Start server");
+										}
+									});
+								} else {
+									Platform.runLater(new Runnable() {
+										@Override
+										public void run() {
+											mainGame.view.startServer.setDisable(false);
+											mainGame.view.connect.setText("Connect");
+										}
+									});
+								}
+								break;
 							}
 						}
 					} else if (!mainGame.model.client.isAlive()) {
 						mainGame.model.client.stop();
-						mainGame.view.connect.setText("Connect");
+						if (mainGame.model.getGameStatus() == GameStatus.STARTED) {
+							mainGame.initGame();
+							mainGame.repaintBoard(0);
+							mainGame.repaintBoard(1);
+						}
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								mainGame.view.connect.setText("Connect");
+							}
+						});
 						if (mainGame.model.server.isRunning()) {
 							mainGame.model.server.stop();
-							mainGame.view.connect.setDisable(false);
-							mainGame.view.startServer.setText("Start server");
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									mainGame.view.connect.setDisable(false);
+									mainGame.view.startServer.setText("Start server");
+								}
+							});
 						} else {
-							mainGame.view.startServer.setDisable(false);
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									mainGame.view.startServer.setDisable(false);
+								}
+							});
 						}
-						mainGame.view.setStatus("Broken connection");
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								mainGame.view.setStatus("Broken connection");
+							}
+						});
 					}
 					try {
-						Thread.sleep(1000);
+						Thread.sleep(300);
 					} catch (InterruptedException ex) {
 					}
 				}
